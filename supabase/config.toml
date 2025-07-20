@@ -1,0 +1,9 @@
+
+project_id = "yhlxoypsnlraplpifrfg"
+
+# Set the callback URL for GitHub OAuth
+[auth.external.github]
+enabled = true
+client_id = "" # You'll need to set this in the Supabase dashboard
+secret = "" # You'll need to set this in the Supabase dashboard
+redirect_uri = "https://yhlxoypsnlraplpifrfg.supabase.co/auth/v1/callback"

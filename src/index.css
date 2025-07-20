@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 25 95% 53%; /* Red-orange */
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 25 95% 53%; /* Red-orange */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 2%;
+    --foreground: 210 20% 98%;
+    --card: 0 0% 5%;
+    --card-foreground: 210 20% 98%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 25 95% 53%; /* Red-orange */
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 25 95% 53%; /* Red-orange */
+  }
+
+  /* Future theme */
+  .future {
+    --background: 225 50% 12%;
+    --foreground: 210 20% 98%;
+    --card: 225 60% 8%;
+    --card-foreground: 210 20% 98%;
+    --popover: 225 60% 8%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 225 30% 16%;
+    --muted-foreground: 217.9 15% 65%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
+  }
+
+  /* Cyberpunk theme */
+  .cyberpunk {
+    --background: 240 25% 5%;
+    --foreground: 0 0% 98%;
+    --card: 240 30% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 30% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 326 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 196 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 20% 12%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 64 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 15% 14%;
+    --input: 240 15% 14%;
+    --ring: 326 100% 60%;
+    --radius: 0.25rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Shadow definitions for glow effects */
+@layer utilities {
+  .shadow-glow-blue {
+    box-shadow: 0 0 15px 2px rgba(59, 130, 246, 0.3);
+  }
+  
+  .shadow-glow-purple {
+    box-shadow: 0 0 15px 2px rgba(139, 92, 246, 0.3);
+  }
+  
+  .shadow-glow-green {
+    box-shadow: 0 0 15px 2px rgba(16, 185, 129, 0.3);
+  }
+  
+  .shadow-glow-red {
+    box-shadow: 0 0 15px 2px rgba(239, 68, 68, 0.3);
+  }
+  
+  .shadow-glow-orange {
+    box-shadow: 0 0 15px 2px rgba(249, 115, 22, 0.3);
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .product-card .product-actions,
+  .product-card .product-actions-future {
+    @apply mt-4;
+  }
+}
+
+/* Futuristic background gradients */
+.bg-future-gradient {
+  background: linear-gradient(135deg, #070B34 0%, #141E39 50%, #0A1128 100%);
+}
+
+.bg-cyber-gradient {
+  background: linear-gradient(135deg, #180835 0%, #000000 100%);
+}
+
+.neon-text {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px currentColor;
+}
+
+.neon-border {
+  box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
+}
+
+/* Advanced hover effects */
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 15px 5px var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-morphism,
+.future .glass-morphism,
+.cyberpunk .glass-morphism {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced focus state for accessibility */
+.focus-ring {
+  @apply outline-none ring-offset-2 ring-2 ring-primary;
+}
+
+/* Single grid line overlay */
+.grid-line-overlay {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), 
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.dark .grid-line-overlay, 
+.future .grid-line-overlay,
+.cyberpunk .grid-line-overlay {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
