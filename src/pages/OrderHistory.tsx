@@ -10,40 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronUp, ArrowLeft, User, ShoppingBag } from "lucide-react";
-
-const mockOrders = [
-  {
-    id: "ORD-001",
-    date: "2024-06-01",
-    status: "delivered",
-    total: 299.99,
-    items: [
-      { name: "Gaming Headset", price: 149.99, quantity: 1 },
-      { name: "Wireless Mouse", price: 79.99, quantity: 1 },
-      { name: "Mouse Pad", price: 19.99, quantity: 1 }
-    ]
-  },
-  {
-    id: "ORD-002", 
-    date: "2024-05-28",
-    status: "shipped",
-    total: 899.99,
-    items: [
-      { name: "Gaming Laptop", price: 899.99, quantity: 1 }
-    ]
-  },
-  {
-    id: "ORD-003",
-    date: "2024-05-20",
-    status: "processing",
-    total: 199.99,
-    items: [
-      { name: "Bluetooth Speaker", price: 99.99, quantity: 1 },
-      { name: "Phone Case", price: 29.99, quantity: 1 },
-      { name: "Screen Protector", price: 15.99, quantity: 1 }
-    ]
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -73,14 +41,40 @@ const getStatusColor = (status: string) => {
 
 const OrderHistory = () => {
   const [openOrders, setOpenOrders] = useState<string[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user) {
       navigate("/login");
+      return;
     }
-  }, [user, navigate]);
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        // Fetch orders for the current user
+        const { data: ordersData, error } = await supabase
+          .from("orders")
+          .select("id, created_at, status, total_amount, order_items:order_items(id, product_name, unit_price, quantity)")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        setOrders(ordersData || []);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load your orders",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [user, navigate, toast]);
 
   const toggleOrder = (orderId: string) => {
     setOpenOrders(prev => 
@@ -141,125 +135,114 @@ const OrderHistory = () => {
         <div className="container mx-auto py-8 px-4">
 
           <div className="space-y-4">
-            {mockOrders.map((order) => (
-              <Collapsible
-                key={order.id}
-                open={openOrders.includes(order.id)}
-                onOpenChange={() => toggleOrder(order.id)}
-              >
-                <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            {openOrders.includes(order.id) ? (
-                              <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                            )}
-                            <div>
-                              <CardTitle className="text-lg">Order {order.id}</CardTitle>
-                              <CardDescription>
-                                {new Date(order.date).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <div className="text-right">
-                            <p className="text-sm text-muted-foreground">Total</p>
-                            <p className="text-lg font-bold">${order.total}</p>
-                          </div>
-                          <Badge 
-                            className={`${getStatusColor(order.status)} text-white`}
-                            variant="secondary"
-                          >
-                            {getStatusIcon(order.status)}
-                            <span className="ml-1 capitalize">{order.status}</span>
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent>
-                    <CardContent className="pt-0">
-                      <Separator className="mb-4" />
-                      
-                      {/* Order Items */}
-                      <div className="space-y-3 mb-6">
-                        <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                          Items ({order.items.length})
-                        </h4>
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex items-center justify-between py-3 border-b border-muted/50 last:border-0">
-                            <div className="flex items-center space-x-4">
-                              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                                <Package className="h-6 w-6 text-muted-foreground" />
-                              </div>
+            {loading ? (
+              <div>Loading your orders...</div>
+            ) : orders.length === 0 ? (
+              <div>No orders found.</div>
+            ) : (
+              orders.map((order) => (
+                <Collapsible
+                  key={order.id}
+                  open={openOrders.includes(order.id)}
+                  onOpenChange={() => toggleOrder(order.id)}
+                >
+                  <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-2">
+                              {openOrders.includes(order.id) ? (
+                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              )}
                               <div>
-                                <p className="font-medium">{item.name}</p>
-                                <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                <CardTitle className="text-lg">Order {order.id.slice(0, 8)}</CardTitle>
+                                <CardDescription>
+                                  {new Date(order.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  })}
+                                </CardDescription>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-semibold">${item.price}</p>
-                              <p className="text-xs text-muted-foreground">
-                                ${(item.price / item.quantity).toFixed(2)} each
-                              </p>
-                            </div>
                           </div>
-                        ))}
-                      </div>
-                      
-                      {/* Action Buttons */}
-                      <div className="flex items-center justify-between pt-4">
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
-                          {order.status === "delivered" && (
-                            <Button variant="outline" size="sm">
-                              Reorder
-                            </Button>
-                          )}
-                          {order.status === "shipped" && (
-                            <Button variant="outline" size="sm">
-                              Track Package
-                            </Button>
-                          )}
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <p className="text-sm text-muted-foreground">Total</p>
+                              <p className="text-lg font-bold">KES {order.total_amount}</p>
+                            </div>
+                            <Badge 
+                              className={`${getStatusColor(order.status)} text-white`}
+                              variant="secondary"
+                            >
+                              {getStatusIcon(order.status)}
+                              <span className="ml-1 capitalize">{order.status}</span>
+                            </Badge>
+                          </div>
                         </div>
-                        
-                        <div className="bg-muted/50 px-4 py-2 rounded-lg">
-                          <p className="text-sm text-muted-foreground">Order Total</p>
-                          <p className="text-xl font-bold">${order.total}</p>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <CardContent className="pt-0">
+                        <Separator className="mb-4" />
+                        {/* Order Items */}
+                        <div className="space-y-3 mb-6">
+                          <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                            Items ({order.order_items?.length || 0})
+                          </h4>
+                          {order.order_items?.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between py-3 border-b border-muted/50 last:border-0">
+                              <div className="flex items-center space-x-4">
+                                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                                  <Package className="h-6 w-6 text-muted-foreground" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{item.product_name}</p>
+                                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold">KES {item.total_price || (item.unit_price * item.quantity)}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  KES {item.unit_price} each
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            ))}
+                        {/* Action Buttons */}
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                            {order.status === "delivered" && (
+                              <Button variant="outline" size="sm">
+                                Reorder
+                              </Button>
+                            )}
+                            {order.status === "shipped" && (
+                              <Button variant="outline" size="sm">
+                                Track Package
+                              </Button>
+                            )}
+                          </div>
+                          <div className="bg-muted/50 px-4 py-2 rounded-lg">
+                            <p className="text-sm text-muted-foreground">Order Total</p>
+                            <p className="text-xl font-bold">KES {order.total_amount}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              ))
+            )}
           </div>
 
-          {mockOrders.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-12">
-                <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No orders yet</h3>
-                <p className="text-gray-500 mb-4">Start shopping to see your orders here</p>
-                <Button onClick={() => navigate("/products")}>
-                  Browse Products
-                </Button>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </main>
       <Footer />

@@ -104,19 +104,8 @@ const QuickAddToCart = () => {
     }
   };
 
-  if (!user) return null;
-
-  return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <Button
-        onClick={addSampleProductToCart}
-        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
-      >
-        <ShoppingCart className="h-4 w-4 mr-2" />
-        Test Add to Cart
-      </Button>
-    </div>
-  );
+  // Do not render any button or UI
+  return null;
 };
 
-export default QuickAddToCart;
+export default QuickAddToCart; 

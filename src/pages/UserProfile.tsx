@@ -122,25 +122,46 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-            My Profile
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Manage your personal information and preferences
-          </p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+      {/* Header Section for easy navigation */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate(-1)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white"
+                onClick={() => navigate("/orders")}
+              >
+                <User className="h-4 w-4 mr-2" />
+                Order History
+              </Button>
+              <Button
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white"
+                onClick={() => navigate("/products")}
+              >
+                Continue Shopping
+              </Button>
+            </div>
+          </div>
+          <div className="mt-4">
+            <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+            <p className="text-white/80">Manage your personal information and preferences</p>
+          </div>
         </div>
-
+      </div>
+      <div className="container mx-auto py-8 px-4 flex-grow">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Overview */}
           <Card className="lg:col-span-1">
