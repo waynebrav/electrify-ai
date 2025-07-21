@@ -49,6 +49,7 @@ interface User {
 const UserManagement = () => {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
+  console.log('Current frontend user:', currentUser);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -66,31 +67,31 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Get all users from profiles table
+      // Get all users from profiles table, including auth_provider
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*");
+        .select("*, auth_provider");
 
       if (profilesError) throw profilesError;
 
       // Get all user roles
       const { data: rolesData, error: rolesError } = await supabase
         .from("user_roles")
-        .select("*");
+        .select("user_id, role");
 
       if (rolesError) throw rolesError;
 
       // Map roles to users
-      const usersWithRoles = profilesData.map((profile: any) => {
+      const users = profilesData.map((profile: any) => {
         const userRoles = rolesData
           .filter((role: any) => role.user_id === profile.id)
           .map((role: any) => role.role);
-
         return {
           id: profile.id,
           email: profile.email,
           created_at: profile.created_at,
           roles: userRoles,
+          authMethod: profile.auth_provider || "password",
           profile: {
             first_name: profile.first_name,
             last_name: profile.last_name,
@@ -98,7 +99,8 @@ const UserManagement = () => {
         };
       });
 
-      setUsers(usersWithRoles);
+      setUsers(users);
+      console.log('Fetched users:', users);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -271,6 +273,7 @@ const UserManagement = () => {
     }
   };
 
+  // Restore search and filter logic
   const filteredUsers = users.filter(user => {
     const query = searchQuery.toLowerCase();
     return (
@@ -279,6 +282,7 @@ const UserManagement = () => {
       user.profile?.last_name?.toLowerCase().includes(query)
     );
   });
+  console.log('Filtered users:', filteredUsers);
 
   return (
     <div className="w-full space-y-6">
