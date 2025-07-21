@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LayoutGrid, Layout } from "lucide-react";
@@ -46,6 +46,7 @@ const Products = () => {
   const categorySlug = searchParams.get('category');
   const brandParam = searchParams.get('brand');
   const searchQuery = searchParams.get('q');
+  const navigate = useNavigate();
 
   // Fetch categories for filter
   const { data: categories } = useQuery({
@@ -209,11 +210,7 @@ const Products = () => {
           cartId = cart.id;
         }
       } else {
-        toast({
-          title: "Please log in",
-          description: "You need to be logged in to add items to cart",
-          variant: "destructive",
-        });
+        navigate("/login");
         return;
       }
       
