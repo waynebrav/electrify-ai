@@ -34,6 +34,15 @@ import { useAuth } from "@/context/AuthContext";
 import React from 'react';
 import { useLocation } from "react-router-dom";
 
+// ScrollToTop component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -78,6 +87,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <PreferencesSurveyHandler />
               <Routes>
                 <Route path="/" element={<Index />} />
