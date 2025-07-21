@@ -27,6 +27,14 @@ interface Message {
   created_at: string;
 }
 
+// UUID v4 fallback
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const ChatBot = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -73,7 +81,7 @@ const ChatBot = () => {
       
       // Add welcome message
       const welcomeMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         message: "Hello! How can I help you today?",
         sender_type: "bot",
         created_at: new Date().toISOString()
@@ -112,7 +120,7 @@ const ChatBot = () => {
     if (!inputMessage.trim() || !conversationId || !user) return;
 
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       message: inputMessage,
       sender_type: "user",
       created_at: new Date().toISOString()
@@ -141,7 +149,7 @@ const ChatBot = () => {
       if (error) throw error;
 
       const botMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         message: data.response,
         sender_type: "bot",
         created_at: new Date().toISOString()
@@ -161,7 +169,7 @@ const ChatBot = () => {
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         message: "Sorry, I'm having trouble responding right now. Please try again.",
         sender_type: "bot",
         created_at: new Date().toISOString()
@@ -173,6 +181,17 @@ const ChatBot = () => {
   };
 
   const startRecording = async () => {
+    if (
+      !navigator.mediaDevices ||
+      typeof navigator.mediaDevices.getUserMedia !== 'function'
+    ) {
+      toast({
+        title: "Error",
+        description: "Your browser does not support audio recording.",
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -200,12 +219,12 @@ const ChatBot = () => {
         description: "Speak now... Click the mic again to stop."
       });
     } catch (error) {
-      console.error('Error starting recording:', error);
       toast({
-        title: "Error",
-        description: "Could not access microphone",
+        title: "Permission denied",
+        description: "Please allow microphone access to use voice features.",
         variant: "destructive"
       });
+      console.error('Error starting recording:', error);
     }
   };
 
@@ -232,14 +251,74 @@ const ChatBot = () => {
           body: { audio: base64Audio }
         });
 
+        console.log('voice-to-text response:', data, error);
+
         if (error) throw error;
 
         if (data.text) {
+          console.log('Transcribed text:', data.text);
           setInputMessage(data.text);
           toast({
             title: "Transcription completed",
             description: "Your voice has been converted to text"
           });
+          // Automatically send the transcribed message
+          if (data.text.trim()) {
+            // Simulate sending the message
+            const userMessage = {
+              id: uuidv4(),
+              message: data.text,
+              sender_type: "user",
+              created_at: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, userMessage]);
+            setIsLoading(true);
+            try {
+              // Save user message
+              await supabase
+                .from("chat_messages")
+                .insert({
+                  conversation_id: conversationId,
+                  sender_id: user.id,
+                  sender_type: "user",
+                  message: data.text
+                });
+              // Get bot response
+              const { data: botData, error: botError } = await supabase.functions.invoke('chatbot', {
+                body: { message: data.text, conversationId }
+              });
+              if (botError) throw botError;
+              const botMessage = {
+                id: uuidv4(),
+                message: botData.response,
+                sender_type: "bot",
+                created_at: new Date().toISOString()
+              };
+              setMessages(prev => [...prev, botMessage]);
+              // Save bot message
+              await supabase
+                .from("chat_messages")
+                .insert({
+                  conversation_id: conversationId,
+                  sender_type: "bot",
+                  message: botData.response
+                });
+            } catch (error) {
+              console.error("Error sending message:", error);
+              const errorMessage = {
+                id: uuidv4(),
+                message: "Sorry, I'm having trouble responding right now. Please try again.",
+                sender_type: "bot",
+                created_at: new Date().toISOString()
+              };
+              setMessages(prev => [...prev, errorMessage]);
+            } finally {
+              setIsLoading(false);
+              setInputMessage("");
+            }
+          }
+        } else {
+          console.warn('No transcribed text returned from voice-to-text.');
         }
       };
     } catch (error) {

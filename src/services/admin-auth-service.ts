@@ -35,3 +35,18 @@ export const getCurrentAdmin = async (email: string) => {
   
   return data;
 };
+
+// Check if a user is an admin by email (case-insensitive)
+export const isAdmin = async (email: string): Promise<boolean> => {
+  if (!email) return false;
+  const { data, error } = await supabase
+    .from('admins')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .single();
+  if (error) {
+    console.error('Error checking admin:', error);
+    return false;
+  }
+  return !!data;
+};

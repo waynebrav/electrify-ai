@@ -66,7 +66,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Get all users
+      // Get all users from profiles table
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("*");
