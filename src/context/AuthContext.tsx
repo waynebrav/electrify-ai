@@ -21,8 +21,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string, userData?: Record<string, any>) => Promise<any>;
   signOut: () => Promise<void>;
-  signInWithGoogle?: () => Promise<any>;
-  signInWithGithub?: () => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
+  signInWithGithub: () => Promise<any>;
   checkIsAdmin: () => Promise<boolean>;
   refreshProfile: () => Promise<void>;
   setIsFirstLogin: (value: boolean) => void;

@@ -54,6 +54,8 @@ interface Product {
   is_new: boolean;
   is_bestseller: boolean;
   currency: string;
+  video_url: string | null;
+  model_3d_url: string | null;
   product_images: ProductImage[];
   product_specifications: ProductSpecification[];
   category: {
@@ -530,9 +532,15 @@ const ProductDetail = () => {
           
           {/* Product Details Tabs */}
           <Tabs defaultValue="description" className="mb-12">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className={`grid w-full ${(product.video_url || product.model_3d_url) ? 'grid-cols-5' : 'grid-cols-3'}`}>
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
+              {product.video_url && (
+                <TabsTrigger value="video">Video</TabsTrigger>
+              )}
+              {product.model_3d_url && (
+                <TabsTrigger value="3d-model">3D Model</TabsTrigger>
+              )}
               <TabsTrigger value="shipping">Shipping & Returns</TabsTrigger>
             </TabsList>
             <TabsContent value="description" className="mt-6">
@@ -587,6 +595,52 @@ const ProductDetail = () => {
                 )}
               </div>
             </TabsContent>
+            {product.video_url && (
+              <TabsContent value="video" className="mt-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Product Video</h3>
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                    <video 
+                      controls 
+                      className="w-full h-full object-cover"
+                      poster={product.product_images[0]?.url}
+                    >
+                      <source src={product.video_url} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              </TabsContent>
+            )}
+            {product.model_3d_url && (
+              <TabsContent value="3d-model" className="mt-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">3D Model View</h3>
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                      <Eye className="h-12 w-12 mx-auto text-gray-400" />
+                      <div>
+                        <h4 className="font-medium">3D Model Available</h4>
+                        <p className="text-sm text-gray-600">Click the button below to view the interactive 3D model</p>
+                        <Button 
+                          asChild 
+                          className="mt-3"
+                          variant="outline"
+                        >
+                          <a 
+                            href={product.model_3d_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            Open 3D Model
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            )}
             <TabsContent value="shipping" className="mt-6">
               <div className="space-y-4">
                 <div>

@@ -25,6 +25,26 @@ const Login = () => {
     }
   }, [user, navigate]);
 
+  const handleSocialSignIn = async (provider: 'google' | 'github') => {
+    setIsLoading(true);
+    try {
+      if (provider === 'google' && signInWithGoogle) {
+        await signInWithGoogle();
+      } else if (provider === 'github' && signInWithGithub) {
+        await signInWithGithub();
+      }
+      // OAuth redirect will handle navigation
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || `Failed to sign in with ${provider}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

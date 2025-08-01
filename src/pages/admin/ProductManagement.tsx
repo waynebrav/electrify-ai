@@ -41,6 +41,8 @@ interface Product {
   status: string;
   description: string;
   category_id?: string;
+  video_url?: string;
+  model_3d_url?: string;
   categories?: {
     name: string;
   };
@@ -62,6 +64,8 @@ const ProductManagement = () => {
     stock_quantity: "",
     category_id: "",
     status: "Active",
+    video_url: "",
+    model_3d_url: "",
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -80,6 +84,8 @@ const ProductManagement = () => {
           status,
           description,
           category_id,
+          video_url,
+          model_3d_url,
           categories (name)
         `)
         .order("created_at", { ascending: false });
@@ -207,6 +213,8 @@ const ProductManagement = () => {
       stock_quantity: "",
       category_id: "",
       status: "Active",
+      video_url: "",
+      model_3d_url: "",
     });
   };
 
@@ -228,6 +236,8 @@ const ProductManagement = () => {
       stock_quantity: product.stock_quantity.toString(),
       category_id: product.category_id || "",
       status: product.status,
+      video_url: product.video_url || "",
+      model_3d_url: product.model_3d_url || "",
     });
     setIsAddProductOpen(true);
   };
@@ -338,6 +348,26 @@ const ProductManagement = () => {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="video_url">Product Video URL</Label>
+                <Input
+                  id="video_url"
+                  type="url"
+                  value={formData.video_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
+                  placeholder="https://example.com/video.mp4"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="model_3d_url">3D Model URL</Label>
+                <Input
+                  id="model_3d_url"
+                  type="url"
+                  value={formData.model_3d_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, model_3d_url: e.target.value }))}
+                  placeholder="https://example.com/model.glb"
                 />
               </div>
               <DialogFooter>
