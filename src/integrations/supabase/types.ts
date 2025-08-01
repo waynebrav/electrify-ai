@@ -1111,6 +1111,7 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          auth_provider: string | null
           avatar_url: string | null
           city: string | null
           country: string | null
@@ -1128,6 +1129,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          auth_provider?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
@@ -1145,6 +1147,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          auth_provider?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
@@ -1384,18 +1387,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string | null
+          email: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"]
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
+          email?: string | null
           id?: string
           role: Database["public"]["Enums"]["user_role"]
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
+          email?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
           user_id?: string | null
