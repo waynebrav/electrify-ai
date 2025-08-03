@@ -73,6 +73,9 @@ const ProductManagement = () => {
     video_url: "",
     model_3d_url: "",
     image_url: "",
+    image_url_1: "",
+    image_url_2: "",
+    image_url_3: "",
   });
 
   useEffect(() => {
@@ -278,6 +281,9 @@ const ProductManagement = () => {
       video_url: "",
       model_3d_url: "",
       image_url: "",
+      image_url_1: "",
+      image_url_2: "",
+      image_url_3: "",
     });
   };
 
@@ -296,6 +302,9 @@ const ProductManagement = () => {
       video_url: "",
       model_3d_url: "",
       image_url: "",
+      image_url_1: "",
+      image_url_2: "",
+      image_url_3: "",
     });
   };
 
@@ -310,7 +319,7 @@ const ProductManagement = () => {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>Add a new product to your inventory</DialogDescription>
@@ -328,7 +337,7 @@ const ProductManagement = () => {
 
       {/* Edit Product Dialog */}
       <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
@@ -490,40 +499,80 @@ const ProductForm = ({ formData, onInputChange, onSwitchChange, onSubmit, submit
       </div>
     )}
 
-    <div className="space-y-2">
-      <Label htmlFor="image_url">Product Image URL</Label>
-      <Input
-        id="image_url"
-        name="image_url"
-        type="url"
-        value={formData.image_url}
-        onChange={onInputChange}
-        placeholder="https://example.com/image.jpg"
-      />
-    </div>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Product Media</h3>
+      
+      <div className="space-y-2">
+        <Label htmlFor="image_url">Primary Image URL</Label>
+        <Input
+          id="image_url"
+          name="image_url"
+          type="url"
+          value={formData.image_url}
+          onChange={onInputChange}
+          placeholder="https://example.com/image.jpg"
+        />
+      </div>
 
-    <div className="space-y-2">
-      <Label htmlFor="video_url">Product Video URL</Label>
-      <Input
-        id="video_url"
-        name="video_url"
-        type="url"
-        value={formData.video_url}
-        onChange={onInputChange}
-        placeholder="https://example.com/video.mp4"
-      />
-    </div>
+      <div className="space-y-2">
+        <Label htmlFor="image_url_1">Product Image 1 URL</Label>
+        <Input
+          id="image_url_1"
+          name="image_url_1"
+          type="url"
+          value={formData.image_url_1}
+          onChange={onInputChange}
+          placeholder="https://example.com/image1.jpg"
+        />
+      </div>
 
-    <div className="space-y-2">
-      <Label htmlFor="model_3d_url">3D Model URL</Label>
-      <Input
-        id="model_3d_url"
-        name="model_3d_url"
-        type="url"
-        value={formData.model_3d_url}
-        onChange={onInputChange}
-        placeholder="https://example.com/model.glb"
-      />
+      <div className="space-y-2">
+        <Label htmlFor="image_url_2">Product Image 2 URL</Label>
+        <Input
+          id="image_url_2"
+          name="image_url_2"
+          type="url"
+          value={formData.image_url_2}
+          onChange={onInputChange}
+          placeholder="https://example.com/image2.jpg"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image_url_3">Product Image 3 URL</Label>
+        <Input
+          id="image_url_3"
+          name="image_url_3"
+          type="url"
+          value={formData.image_url_3}
+          onChange={onInputChange}
+          placeholder="https://example.com/image3.jpg"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="video_url">Product Video URL</Label>
+        <Input
+          id="video_url"
+          name="video_url"
+          type="url"
+          value={formData.video_url}
+          onChange={onInputChange}
+          placeholder="https://example.com/video.mp4"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="model_3d_url">3D Model URL</Label>
+        <Input
+          id="model_3d_url"
+          name="model_3d_url"
+          type="url"
+          value={formData.model_3d_url}
+          onChange={onInputChange}
+          placeholder="https://example.com/model.glb"
+        />
+      </div>
     </div>
 
     <DialogFooter>
