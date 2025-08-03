@@ -265,10 +265,10 @@ const ChatBot = () => {
           // Automatically send the transcribed message
           if (data.text.trim()) {
             // Simulate sending the message
-            const userMessage = {
+            const userMessage: Message = {
               id: uuidv4(),
               message: data.text,
-              sender_type: "user",
+              sender_type: "user" as const,
               created_at: new Date().toISOString()
             };
             setMessages(prev => [...prev, userMessage]);
@@ -288,10 +288,10 @@ const ChatBot = () => {
                 body: { message: data.text, conversationId }
               });
               if (botError) throw botError;
-              const botMessage = {
+              const botMessage: Message = {
                 id: uuidv4(),
                 message: botData.response,
-                sender_type: "bot",
+                sender_type: "bot" as const,
                 created_at: new Date().toISOString()
               };
               setMessages(prev => [...prev, botMessage]);
@@ -305,10 +305,10 @@ const ChatBot = () => {
                 });
             } catch (error) {
               console.error("Error sending message:", error);
-              const errorMessage = {
+              const errorMessage: Message = {
                 id: uuidv4(),
                 message: "Sorry, I'm having trouble responding right now. Please try again.",
-                sender_type: "bot",
+                sender_type: "bot" as const,
                 created_at: new Date().toISOString()
               };
               setMessages(prev => [...prev, errorMessage]);

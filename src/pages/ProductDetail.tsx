@@ -54,8 +54,8 @@ interface Product {
   is_new: boolean;
   is_bestseller: boolean;
   currency: string;
-  video_url: string | null;
-  model_3d_url: string | null;
+  video_url?: string | null;
+  model_3d_url?: string | null;
   product_images: ProductImage[];
   product_specifications: ProductSpecification[];
   category: {

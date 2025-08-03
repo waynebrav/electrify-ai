@@ -32,7 +32,7 @@ const Index = () => {
       <main className="flex-grow">
         <section className="relative w-full group">
           <Carousel
-            plugins={[plugin.current]}
+            plugins={[plugin.current as any]}
             className="w-full"
             opts={{
               loop: true,

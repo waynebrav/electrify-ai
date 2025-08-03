@@ -84,8 +84,6 @@ const ProductManagement = () => {
           status,
           description,
           category_id,
-          video_url,
-          model_3d_url,
           categories (name)
         `)
         .order("created_at", { ascending: false });
@@ -236,8 +234,8 @@ const ProductManagement = () => {
       stock_quantity: product.stock_quantity.toString(),
       category_id: product.category_id || "",
       status: product.status,
-      video_url: product.video_url || "",
-      model_3d_url: product.model_3d_url || "",
+      video_url: "",
+      model_3d_url: "",
     });
     setIsAddProductOpen(true);
   };
