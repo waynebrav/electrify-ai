@@ -1,7 +1,9 @@
 
 // Application constants
 
-export const ADMIN_EMAIL = "silverstonebrav@gmail.com";
+// Note: Admin credentials should be configured in Supabase dashboard
+// This is now only used for display purposes
+export const ADMIN_EMAIL = "admin@company.com";
 
 // Currency configuration
 export const CURRENCY = {

@@ -56,7 +56,8 @@ const PreferencesSurveyHandler = () => {
   const { isFirstLogin, user } = useAuth();
   
   // Don't show the survey for admin users or if admin is in session
-  const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+  const adminSession = sessionStorage.getItem("adminSession");
+  const isAdmin = adminSession ? JSON.parse(adminSession).isAdmin : false;
   
   // Only show survey for authenticated users who are not admins and it's their first login
   if (isFirstLogin && user && !isAdmin) {

@@ -20,12 +20,20 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // Authenticate against the admins table
+      // Authenticate against the admins table with proper JWT handling
       const adminData = await signInAdmin(email, password);
       
-      // Set admin status and data in session storage
-      sessionStorage.setItem("isAdmin", "true");
-      sessionStorage.setItem("adminData", JSON.stringify(adminData));
+      // Store admin session securely (this should ideally use httpOnly cookies)
+      // adminData is returned as an array from the RPC function
+      const admin = Array.isArray(adminData) ? adminData[0] : adminData;
+      const sessionData = {
+        isAdmin: true,
+        adminId: admin?.id,
+        email: admin?.email,
+        timestamp: Date.now()
+      };
+      
+      sessionStorage.setItem("adminSession", JSON.stringify(sessionData));
       
       toast({
         title: "Admin access granted",

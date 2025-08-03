@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
+import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
+import { validatePasswordStrength, authRateLimiter } from "@/utils/security";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -31,6 +33,28 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Rate limiting check
+    if (!authRateLimiter.canAttempt(email)) {
+      const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(email) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${remainingTime} minutes before trying again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Password validation
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Password too weak",
+        description: "Please create a stronger password.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (password !== confirmPassword) {
       toast({
         title: "Passwords do not match",
@@ -49,13 +73,15 @@ const Register = () => {
       });
       toast({
         title: "Registration successful!",
-        description: "Welcome to Electrify.",
+        description: "Please check your email to verify your account.",
       });
+      
+      navigate("/");
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({
         title: "Registration failed",
-        description: error.message,
+        description: error.message || "An error occurred during registration.",
         variant: "destructive",
       });
     } finally {
@@ -201,6 +227,7 @@ const Register = () => {
                     )}
                   </button>
                 </div>
+                <PasswordStrengthIndicator password={password} />
               </div>
 
               <div>

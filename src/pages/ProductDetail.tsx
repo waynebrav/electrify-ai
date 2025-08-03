@@ -549,8 +549,8 @@ const ProductDetail = () => {
                   <div>
                     <div 
                       className={`${!showMoreDescription && 'max-h-60 overflow-hidden relative'}`}
-                      dangerouslySetInnerHTML={{ __html: product.description }}
                     >
+                      {product.description}
                     </div>
                     {product.description.length > 300 && (
                       <Button

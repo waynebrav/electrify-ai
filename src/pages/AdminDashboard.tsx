@@ -53,14 +53,29 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const verifyAccess = () => {
-      const hasAdminAccess = sessionStorage.getItem("isAdmin") === "true";
+      const adminSession = sessionStorage.getItem("adminSession");
+      let hasAdminAccess = false;
+      
+      if (adminSession) {
+        try {
+          const sessionData = JSON.parse(adminSession);
+          // Check if session is not expired (24 hours)
+          const isValidSession = sessionData.isAdmin && 
+            sessionData.timestamp && 
+            (Date.now() - sessionData.timestamp) < 24 * 60 * 60 * 1000;
+          hasAdminAccess = isValidSession;
+        } catch (error) {
+          console.error("Invalid session data:", error);
+        }
+      }
+      
       setIsAdmin(hasAdminAccess);
       
       if (!hasAdminAccess) {
         console.log("User is not admin, redirecting to admin login");
         toast({
           title: "Access denied",
-          description: "You don't have admin privileges",
+          description: "You must be an admin to access this page.",
           variant: "destructive",
         });
         navigate("/admin/login");
@@ -72,8 +87,11 @@ const AdminDashboard = () => {
 
   const handleSignOut = async () => {
     try {
+      // Clear all admin session data
+      sessionStorage.removeItem("adminSession");
       sessionStorage.removeItem("isAdmin");
       sessionStorage.removeItem("adminData");
+      
       navigate("/");
       toast({
         title: "Signed out",
