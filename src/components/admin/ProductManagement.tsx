@@ -70,6 +70,9 @@ const ProductManagement = () => {
     is_featured: false,
     is_flash_sale: false,
     flash_sale_end: "",
+    video_url: "",
+    model_3d_url: "",
+    image_url: "",
   });
 
   useEffect(() => {
@@ -272,6 +275,9 @@ const ProductManagement = () => {
       is_featured: false,
       is_flash_sale: false,
       flash_sale_end: "",
+      video_url: "",
+      model_3d_url: "",
+      image_url: "",
     });
   };
 
@@ -287,6 +293,9 @@ const ProductManagement = () => {
       flash_sale_end: product.flash_sale_end 
         ? new Date(product.flash_sale_end).toISOString().slice(0, 16) 
         : "",
+      video_url: "",
+      model_3d_url: "",
+      image_url: "",
     });
   };
 
@@ -480,6 +489,42 @@ const ProductForm = ({ formData, onInputChange, onSwitchChange, onSubmit, submit
         />
       </div>
     )}
+
+    <div className="space-y-2">
+      <Label htmlFor="image_url">Product Image URL</Label>
+      <Input
+        id="image_url"
+        name="image_url"
+        type="url"
+        value={formData.image_url}
+        onChange={onInputChange}
+        placeholder="https://example.com/image.jpg"
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="video_url">Product Video URL</Label>
+      <Input
+        id="video_url"
+        name="video_url"
+        type="url"
+        value={formData.video_url}
+        onChange={onInputChange}
+        placeholder="https://example.com/video.mp4"
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="model_3d_url">3D Model URL</Label>
+      <Input
+        id="model_3d_url"
+        name="model_3d_url"
+        type="url"
+        value={formData.model_3d_url}
+        onChange={onInputChange}
+        placeholder="https://example.com/model.glb"
+      />
+    </div>
 
     <DialogFooter>
       <Button type="submit">{submitText}</Button>
