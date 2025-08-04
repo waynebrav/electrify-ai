@@ -71,7 +71,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     if (onViewAr) onViewAr();
-    else window.location.href = `/ar-room?productId=${id}`;
+    else {
+      // Navigate to AR room with the product
+      const url = new URL(window.location.origin + '/ar-room');
+      window.location.href = url.toString();
+    }
   };
 
   const formatPrice = (amount: number) => {

@@ -499,6 +499,18 @@ const ProductDetail = () => {
                   <Heart className="mr-2 h-4 w-4" />
                   Add to Wishlist
                 </Button>
+                {product.model_3d_url && (
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    asChild
+                  >
+                    <Link to="/ar-room">
+                      <Eye className="mr-2 h-4 w-4" />
+                      View in AR
+                    </Link>
+                  </Button>
+                )}
               </div>
               
               {/* Additional Info */}
