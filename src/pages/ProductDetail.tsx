@@ -18,9 +18,10 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ShoppingCart, Heart, ArrowLeft, Star, Package, Clock, Shield, Truck, Eye } from "lucide-react";
+import { ShoppingCart, Heart, ArrowLeft, Star, Package, Clock, Shield, Truck, Eye, Orbit, Play } from "lucide-react";
 import { CURRENCY } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
+import ModelViewer from "@/components/ModelViewer";
 
 interface ProductImage {
   id: string;
@@ -627,28 +628,20 @@ const ProductDetail = () => {
             {product.model_3d_url && (
               <TabsContent value="3d-model" className="mt-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">3D Model View</h3>
-                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <Eye className="h-12 w-12 mx-auto text-gray-400" />
-                      <div>
-                        <h4 className="font-medium">3D Model Available</h4>
-                        <p className="text-sm text-gray-600">Click the button below to view the interactive 3D model</p>
-                        <Button 
-                          asChild 
-                          className="mt-3"
-                          variant="outline"
-                        >
-                          <a 
-                            href={product.model_3d_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            Open 3D Model
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Orbit className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-medium">Interactive 3D Model</h3>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border">
+                    <ModelViewer 
+                      modelUrl={product.model_3d_url} 
+                      className="w-full h-96" 
+                      scale={1.5}
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                    <p>Rotate, zoom, and explore this product in 3D</p>
+                    <p className="mt-1">Hold and drag to rotate • Scroll to zoom • Right-click and drag to pan</p>
                   </div>
                 </div>
               </TabsContent>

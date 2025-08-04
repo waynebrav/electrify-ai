@@ -1031,6 +1031,7 @@ export type Database = {
           sustainability_score: number | null
           updated_at: string | null
           vendor_id: string | null
+          video_url: string | null
           warranty_info: string | null
         }
         Insert: {
@@ -1060,6 +1061,7 @@ export type Database = {
           sustainability_score?: number | null
           updated_at?: string | null
           vendor_id?: string | null
+          video_url?: string | null
           warranty_info?: string | null
         }
         Update: {
@@ -1089,6 +1091,7 @@ export type Database = {
           sustainability_score?: number | null
           updated_at?: string | null
           vendor_id?: string | null
+          video_url?: string | null
           warranty_info?: string | null
         }
         Relationships: [
