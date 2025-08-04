@@ -76,6 +76,7 @@ const ProductManagement = () => {
     image_url_1: "",
     image_url_2: "",
     image_url_3: "",
+    ar_enabled: false,
   });
 
   useEffect(() => {
@@ -284,6 +285,7 @@ const ProductManagement = () => {
       image_url_1: "",
       image_url_2: "",
       image_url_3: "",
+      ar_enabled: false,
     });
   };
 
@@ -305,6 +307,7 @@ const ProductManagement = () => {
       image_url_1: "",
       image_url_2: "",
       image_url_3: "",
+      ar_enabled: false,
     });
   };
 
@@ -319,7 +322,7 @@ const ProductManagement = () => {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>Add a new product to your inventory</DialogDescription>
@@ -337,7 +340,7 @@ const ProductManagement = () => {
 
       {/* Edit Product Dialog */}
       <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
@@ -483,6 +486,15 @@ const ProductForm = ({ formData, onInputChange, onSwitchChange, onSubmit, submit
           onCheckedChange={(checked) => onSwitchChange("is_flash_sale", checked)}
         />
         <Label htmlFor="is_flash_sale">Flash Sale</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="ar_enabled"
+          checked={formData.ar_enabled}
+          onCheckedChange={(checked) => onSwitchChange("ar_enabled", checked)}
+        />
+        <Label htmlFor="ar_enabled">AR Enabled</Label>
       </div>
     </div>
 
