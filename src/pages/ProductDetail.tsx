@@ -19,7 +19,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ShoppingCart, Heart, ArrowLeft, Star, Package, Clock, Shield, Truck, Eye, Orbit, Play } from "lucide-react";
-import { CURRENCY } from "@/lib/constants";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import ModelViewer from "@/components/ModelViewer";
 
@@ -68,6 +68,7 @@ interface Product {
 
 const ProductDetail = () => {
   const { id, slug } = useParams();
+  const { formatPrice } = useCurrency();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
@@ -272,8 +273,8 @@ const ProductDetail = () => {
     }
   };
 
-  const formatPrice = (price: number) => {
-    return `${CURRENCY.symbol} ${price.toLocaleString()}`;
+  const formatCurrency = (price: number) => {
+    return formatPrice(price);
   };
 
   if (isLoading) {
@@ -427,9 +428,9 @@ const ProductDetail = () => {
               
               {/* Price */}
               <div className="flex items-end gap-2 mt-4">
-                <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
+                <span className="text-2xl font-bold">{formatCurrency(product.price)}</span>
                 {product.original_price && (
-                  <span className="text-gray-500 line-through">{formatPrice(product.original_price)}</span>
+                  <span className="text-gray-500 line-through">{formatCurrency(product.original_price)}</span>
                 )}
               </div>
               

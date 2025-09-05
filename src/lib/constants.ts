@@ -5,7 +5,7 @@
 // This is now only used for display purposes
 export const ADMIN_EMAIL = "admin@company.com";
 
-// Currency configuration
+// Legacy currency configuration (deprecated - use CurrencyContext instead)
 export const CURRENCY = {
   code: "KES",
   symbol: "KSh",

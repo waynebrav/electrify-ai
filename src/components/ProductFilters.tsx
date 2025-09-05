@@ -24,7 +24,7 @@ import {
   Tags,
   ChevronDown
 } from "lucide-react";
-import { CURRENCY } from "@/lib/constants";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterProps {
@@ -60,6 +60,7 @@ const ProductFilters: React.FC<FilterProps> = ({
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [priceRangeDisplay, setPriceRangeDisplay] = useState<[number, number]>([0, maxPrice]);
+  const { currency } = useCurrency();
 
   const handlePriceChange = (value: number[]) => {
     const priceRange: [number, number] = [value[0], value[1]];
@@ -192,10 +193,10 @@ const ProductFilters: React.FC<FilterProps> = ({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs">
-                {CURRENCY.symbol} {priceRangeDisplay[0].toLocaleString()}
+                {currency.symbol} {priceRangeDisplay[0].toLocaleString()}
               </span>
               <span className="text-xs">
-                {CURRENCY.symbol} {priceRangeDisplay[1].toLocaleString()}
+                {currency.symbol} {priceRangeDisplay[1].toLocaleString()}
               </span>
             </div>
           </div>
@@ -313,10 +314,10 @@ const ProductFilters: React.FC<FilterProps> = ({
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs">
-                  {CURRENCY.symbol} {priceRangeDisplay[0].toLocaleString()}
+                  {currency.symbol} {priceRangeDisplay[0].toLocaleString()}
                 </span>
                 <span className="text-xs">
-                  {CURRENCY.symbol} {priceRangeDisplay[1].toLocaleString()}
+                  {currency.symbol} {priceRangeDisplay[1].toLocaleString()}
                 </span>
               </div>
             </AccordionContent>

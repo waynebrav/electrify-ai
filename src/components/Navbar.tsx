@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, User, LogOut, Settings, Package, Home, MonitorSmartphone, Search, BarChart3 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { CartBadge } from "./CartBadge";
+import CurrencySelector from "./CurrencySelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +81,7 @@ const Navbar = () => {
                 AR Room
               </Link>
               
+              <CurrencySelector />
               <ThemeToggle />
               <CartBadge />
               
@@ -145,6 +147,7 @@ const Navbar = () => {
           
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
+            <CurrencySelector />
             <ThemeToggle />
             <CartBadge />
             

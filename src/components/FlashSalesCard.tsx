@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Clock } from "lucide-react";
-import { CURRENCY } from "@/lib/constants";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
@@ -34,6 +34,7 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
     seconds: number;
   }>({ hours: 0, minutes: 0, seconds: 0 });
   const [isExpired, setIsExpired] = useState(false);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -79,8 +80,8 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
     if (onAddToCart && !isExpired && stockQuantity > 0) onAddToCart();
   };
 
-  const formatPrice = (amount: number) => {
-    return `${CURRENCY.symbol} ${amount.toFixed(CURRENCY.decimal_digits)}`;
+  const formatCurrency = (amount: number) => {
+    return formatPrice(amount);
   };
   
   return (
@@ -130,10 +131,10 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
         {/* Price section */}
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <span className="font-medium">{formatPrice(price)}</span>
+            <span className="font-medium">{formatCurrency(price)}</span>
             {originalPrice && (
               <span className="text-xs text-gray-500 line-through">
-                {formatPrice(originalPrice)}
+                {formatCurrency(originalPrice)}
               </span>
             )}
           </div>

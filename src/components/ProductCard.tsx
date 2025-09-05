@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star, Sparkles, ScanFace, BrainCircuit, Orbit } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CURRENCY } from "@/lib/constants";
+import { useCurrency } from "@/context/CurrencyContext";
 import { HolographicContainer } from "@/components/ui/holographic-container";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
@@ -52,6 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     : 0;
   
   const { themeMode } = useTheme();
+  const { formatPrice } = useCurrency();
   const isFuturistic = themeMode === "future" || themeMode === "cyberpunk";
   
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -78,8 +79,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  const formatPrice = (amount: number) => {
-    return `${CURRENCY.symbol} ${amount.toLocaleString()}`;
+  const formatCurrency = (amount: number) => {
+    return formatPrice(amount);
   };
   
   // Fix: Use div instead of Fragment to avoid props issues
@@ -250,14 +251,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     "font-medium",
                     isFuturistic && "text-white"
                   )}>
-                    {formatPrice(price)}
+                    {formatCurrency(price)}
                   </span>
                   {originalPrice && (
                     <span className={cn(
                       "text-xs line-through",
                       isFuturistic ? "text-gray-500" : "text-gray-500"
                     )}>
-                      {formatPrice(originalPrice)}
+                      {formatCurrency(originalPrice)}
                     </span>
                   )}
                 </div>
