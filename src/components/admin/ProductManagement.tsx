@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -322,11 +323,12 @@ const ProductManagement = () => {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>Add a new product to your inventory</DialogDescription>
-            </DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Add New Product</DialogTitle>
+            <DialogDescription>Add a new product to your inventory</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[calc(90vh-200px)] pr-4">
             <ProductForm 
               formData={formData}
               onInputChange={handleInputChange}
@@ -334,24 +336,27 @@ const ProductManagement = () => {
               onSubmit={handleAddProduct}
               submitText="Add Product"
             />
-          </DialogContent>
+          </ScrollArea>
+        </DialogContent>
         </Dialog>
       </div>
 
       {/* Edit Product Dialog */}
       <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
           </DialogHeader>
-          <ProductForm 
-            formData={formData}
-            onInputChange={handleInputChange}
-            onSwitchChange={handleSwitchChange}
-            onSubmit={handleUpdateProduct}
-            submitText="Update Product"
-          />
+          <ScrollArea className="max-h-[calc(90vh-200px)] pr-4">
+            <ProductForm 
+              formData={formData}
+              onInputChange={handleInputChange}
+              onSwitchChange={handleSwitchChange}
+              onSubmit={handleUpdateProduct}
+              submitText="Update Product"
+            />
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 

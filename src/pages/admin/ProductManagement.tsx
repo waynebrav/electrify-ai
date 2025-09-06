@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ShoppingBag, Edit, Trash, Search, Plus, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -66,6 +67,10 @@ const ProductManagement = () => {
     status: "Active",
     video_url: "",
     model_3d_url: "",
+    image_url: "",
+    image_url_1: "",
+    image_url_2: "",
+    image_url_3: "",
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -213,6 +218,10 @@ const ProductManagement = () => {
       status: "Active",
       video_url: "",
       model_3d_url: "",
+      image_url: "",
+      image_url_1: "",
+      image_url_2: "",
+      image_url_3: "",
     });
   };
 
@@ -236,6 +245,10 @@ const ProductManagement = () => {
       status: product.status,
       video_url: "",
       model_3d_url: "",
+      image_url: "",
+      image_url_1: "",
+      image_url_2: "",
+      image_url_3: "",
     });
     setIsAddProductOpen(true);
   };
@@ -269,14 +282,15 @@ const ProductManagement = () => {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-4xl max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
               <DialogDescription>
                 {editingProduct ? "Update product information" : "Add a new product to your inventory"}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <ScrollArea className="max-h-[calc(90vh-200px)] pr-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Product Name</Label>
                 <Input
@@ -368,6 +382,55 @@ const ProductManagement = () => {
                   placeholder="https://example.com/model.glb"
                 />
               </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Product Images</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="image_url">Primary Image URL</Label>
+                  <Input
+                    id="image_url"
+                    type="url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image_url_1">Product Image 1 URL</Label>
+                  <Input
+                    id="image_url_1"
+                    type="url"
+                    value={formData.image_url_1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url_1: e.target.value }))}
+                    placeholder="https://example.com/image1.jpg"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image_url_2">Product Image 2 URL</Label>
+                  <Input
+                    id="image_url_2"
+                    type="url"
+                    value={formData.image_url_2}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url_2: e.target.value }))}
+                    placeholder="https://example.com/image2.jpg"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image_url_3">Product Image 3 URL</Label>
+                  <Input
+                    id="image_url_3"
+                    type="url"
+                    value={formData.image_url_3}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url_3: e.target.value }))}
+                    placeholder="https://example.com/image3.jpg"
+                  />
+                </div>
+              </div>
+              
               <DialogFooter>
                 <Button type="submit" disabled={addProductMutation.isPending || updateProductMutation.isPending}>
                   {(addProductMutation.isPending || updateProductMutation.isPending) && (
@@ -376,7 +439,8 @@ const ProductManagement = () => {
                   {editingProduct ? "Update Product" : "Add Product"}
                 </Button>
               </DialogFooter>
-            </form>
+              </form>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
