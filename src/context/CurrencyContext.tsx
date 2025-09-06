@@ -63,21 +63,32 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrencyState] = useState<Currency>(SUPPORTED_CURRENCIES[0]); // Default to KES
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Load saved currency from localStorage
   useEffect(() => {
-    const savedCurrency = localStorage.getItem('selected_currency');
-    if (savedCurrency) {
-      const found = SUPPORTED_CURRENCIES.find(c => c.code === savedCurrency);
-      if (found) {
-        setCurrencyState(found);
+    try {
+      const savedCurrency = localStorage.getItem('selected_currency');
+      if (savedCurrency) {
+        const found = SUPPORTED_CURRENCIES.find(c => c.code === savedCurrency);
+        if (found) {
+          setCurrencyState(found);
+        }
       }
+    } catch (error) {
+      console.error('Error loading saved currency:', error);
+    } finally {
+      setIsInitialized(true);
     }
   }, []);
 
   const setCurrency = (newCurrency: Currency) => {
     setCurrencyState(newCurrency);
-    localStorage.setItem('selected_currency', newCurrency.code);
+    try {
+      localStorage.setItem('selected_currency', newCurrency.code);
+    } catch (error) {
+      console.error('Error saving currency to localStorage:', error);
+    }
   };
 
   const convertPrice = (price: number, fromCurrency: string = 'KES'): number => {
@@ -97,14 +108,16 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     })}`;
   };
 
+  const value = {
+    currency,
+    setCurrency,
+    convertPrice,
+    formatPrice,
+    exchangeRates: EXCHANGE_RATES
+  };
+
   return (
-    <CurrencyContext.Provider value={{
-      currency,
-      setCurrency,
-      convertPrice,
-      formatPrice,
-      exchangeRates: EXCHANGE_RATES
-    }}>
+    <CurrencyContext.Provider value={value}>
       {children}
     </CurrencyContext.Provider>
   );
@@ -113,6 +126,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);
   if (context === undefined) {
+    console.error('useCurrency must be used within a CurrencyProvider');
     throw new Error('useCurrency must be used within a CurrencyProvider');
   }
   return context;

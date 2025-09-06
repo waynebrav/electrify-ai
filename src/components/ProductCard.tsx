@@ -52,7 +52,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
     : 0;
   
   const { themeMode } = useTheme();
-  const { formatPrice } = useCurrency();
+  
+  // Safely get currency formatting with fallback
+  let formatPrice: (price: number, fromCurrency?: string) => string;
+  try {
+    const currencyContext = useCurrency();
+    formatPrice = currencyContext.formatPrice;
+  } catch (error) {
+    console.error('ProductCard: Error accessing currency context:', error);
+    formatPrice = (price: number) => `KSh ${price.toLocaleString()}`;
+  }
+  
   const isFuturistic = themeMode === "future" || themeMode === "cyberpunk";
   
   const handleAddToCart = (e: React.MouseEvent) => {

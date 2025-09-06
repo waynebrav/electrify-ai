@@ -68,7 +68,16 @@ interface Product {
 
 const ProductDetail = () => {
   const { id, slug } = useParams();
-  const { formatPrice } = useCurrency();
+  
+  // Safely get currency formatting with fallback
+  let formatPrice: (price: number, fromCurrency?: string) => string;
+  try {
+    const currencyContext = useCurrency();
+    formatPrice = currencyContext.formatPrice;
+  } catch (error) {
+    console.error('ProductDetail: Error accessing currency context:', error);
+    formatPrice = (price: number) => `KSh ${price.toLocaleString()}`;
+  }
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [showMoreDescription, setShowMoreDescription] = useState(false);

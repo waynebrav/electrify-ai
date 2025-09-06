@@ -34,7 +34,16 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
     seconds: number;
   }>({ hours: 0, minutes: 0, seconds: 0 });
   const [isExpired, setIsExpired] = useState(false);
-  const { formatPrice } = useCurrency();
+  
+  // Safely get currency formatting with fallback
+  let formatPrice: (price: number, fromCurrency?: string) => string;
+  try {
+    const currencyContext = useCurrency();
+    formatPrice = currencyContext.formatPrice;
+  } catch (error) {
+    console.error('FlashSalesCard: Error accessing currency context:', error);
+    formatPrice = (price: number) => `KSh ${price.toLocaleString()}`;
+  }
 
   useEffect(() => {
     const calculateTimeLeft = () => {

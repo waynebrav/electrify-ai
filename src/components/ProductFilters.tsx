@@ -60,7 +60,16 @@ const ProductFilters: React.FC<FilterProps> = ({
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [priceRangeDisplay, setPriceRangeDisplay] = useState<[number, number]>([0, maxPrice]);
-  const { currency } = useCurrency();
+  
+  // Safely get currency with fallback
+  let currency;
+  try {
+    const currencyContext = useCurrency();
+    currency = currencyContext.currency;
+  } catch (error) {
+    console.error('ProductFilters: Error accessing currency context:', error);
+    currency = { code: "KES", symbol: "KSh", name: "Kenyan Shilling", decimal_digits: 2, rounding: 0 };
+  }
 
   const handlePriceChange = (value: number[]) => {
     const priceRange: [number, number] = [value[0], value[1]];
