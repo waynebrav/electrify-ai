@@ -56,7 +56,7 @@ const ProductRecommendations = ({ productId, className = "" }: ProductRecommenda
       // Format the recommendations to match the expected structure
       const formattedRecommendations = (data.recommendations || []).map((product: any) => ({
         ...product,
-        image: product.image || '/placeholder.svg',
+        image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
         rating: 4 + Math.random() * 0.9,
         reviewCount: Math.floor(Math.random() * 200) + 50,
         isNew: Math.random() > 0.7,

@@ -57,7 +57,10 @@ interface Product {
   currency: string;
   video_url?: string | null;
   model_3d_url?: string | null;
-  product_images: ProductImage[];
+  image_url?: string | null;
+  image_url_1?: string | null;
+  image_url_2?: string | null;
+  image_url_3?: string | null;
   product_specifications: ProductSpecification[];
   category: {
     id: string;
@@ -109,10 +112,12 @@ const ProductDetail = () => {
   });
 
   useEffect(() => {
-    if (product?.product_images?.length > 0) {
-      // Set primary image as selected, or first image if no primary exists
-      const primaryImage = product.product_images.find(img => img.is_primary);
-      setSelectedImage(primaryImage?.url || product.product_images[0]?.url);
+    if (product) {
+      // Set primary image from products table
+      const primaryImage = product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3;
+      if (primaryImage) {
+        setSelectedImage(primaryImage);
+      }
     }
   }, [product]);
 
@@ -367,33 +372,88 @@ const ProductDetail = () => {
             {/* Product Images */}
             <div className="space-y-4">
               <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 border">
-                {selectedImage && (
+                {selectedImage ? (
                   <img 
                     src={selectedImage} 
                     alt={product.name} 
                     className="w-full h-full object-contain"
                   />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <Package className="h-16 w-16" />
+                  </div>
                 )}
               </div>
               
               {/* Thumbnails */}
-              {product.product_images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {product.product_images.map((image) => (
-                    <button
-                      key={image.id}
-                      onClick={() => setSelectedImage(image.url)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 ${
-                        selectedImage === image.url ? 'border-primary' : 'border-transparent'
-                      }`}
-                    >
-                      <img
-                        src={image.url}
-                        alt={image.alt_text || product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
+              {(() => {
+                const images = [
+                  product.image_url,
+                  product.image_url_1,
+                  product.image_url_2,
+                  product.image_url_3
+                ].filter(Boolean);
+                
+                return images.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {images.map((imageUrl, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImage(imageUrl)}
+                        className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 ${
+                          selectedImage === imageUrl ? 'border-primary' : 'border-transparent'
+                        }`}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`${product.name} image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+              
+              {/* Video and 3D Model buttons */}
+              <div className="flex gap-2">
+                {product.video_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => window.open(product.video_url, '_blank')}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Watch Video
+                  </Button>
+                )}
+                {product.model_3d_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      // Toggle 3D model view
+                      const modelContainer = document.getElementById('model-3d-container');
+                      if (modelContainer) {
+                        modelContainer.style.display = modelContainer.style.display === 'none' ? 'block' : 'none';
+                      }
+                    }}
+                  >
+                    <Orbit className="h-4 w-4 mr-2" />
+                    View 3D Model
+                  </Button>
+                )}
+              </div>
+              
+              {/* 3D Model Viewer */}
+              {product.model_3d_url && (
+                <div id="model-3d-container" style={{ display: 'none' }} className="aspect-square rounded-lg overflow-hidden bg-gray-50 border">
+                  <ModelViewer 
+                    modelUrl={product.model_3d_url}
+                    className="w-full h-full"
+                  />
                 </div>
               )}
             </div>
@@ -626,7 +686,7 @@ const ProductDetail = () => {
                     <video 
                       controls 
                       className="w-full h-full object-cover"
-                      poster={product.product_images[0]?.url}
+                      poster={product.image_url || product.image_url_1}
                     >
                       <source src={product.video_url} type="video/mp4" />
                       Your browser does not support the video tag.

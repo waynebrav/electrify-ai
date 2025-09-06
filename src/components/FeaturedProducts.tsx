@@ -26,7 +26,10 @@ const FeaturedProducts: React.FC = () => {
           is_new,
           is_featured,
           stock_quantity,
-          product_images (url, is_primary)
+          image_url,
+          image_url_1,
+          image_url_2,
+          image_url_3
         `)
         .eq("is_featured", true)
         .eq("status", "Active")
@@ -37,14 +40,15 @@ const FeaturedProducts: React.FC = () => {
         throw error;
       }
       
-      // Format data for the component
-      return data.map(product => ({
+      if (!data) return [];
+      
+       // Format data for the component
+      return data.map((product: any) => ({
         id: product.id,
         name: product.name,
         price: product.price,
         originalPrice: product.original_price,
-        image: product.product_images?.find((img: any) => img.is_primary)?.url || 
-               (product.product_images && product.product_images[0] ? product.product_images[0].url : '/placeholder.svg'),
+        image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
         // Mock data for demo purposes
         rating: 4 + Math.random() * 0.9,
         reviewCount: Math.floor(Math.random() * 200) + 50,
