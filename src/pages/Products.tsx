@@ -92,7 +92,10 @@ const Products = () => {
           is_new,
           is_featured,
           stock_quantity,
-          product_images (url, is_primary)
+          image_url,
+          image_url_1,
+          image_url_2,
+          image_url_3
         `);
       
       // Apply filters
@@ -165,8 +168,7 @@ const Products = () => {
         name: item.name,
         price: item.price,
         originalPrice: item.original_price,
-        image: item.product_images.find((img: any) => img.is_primary)?.url || 
-               (item.product_images[0]?.url || 'https://images.unsplash.com/photo-1593642634367-d91a135587b5'),
+        image: item.image_url || item.image_url_1 || item.image_url_2 || '/placeholder.svg',
         // Mock data for demo
         rating: 4 + Math.random(),
         reviewCount: Math.floor(Math.random() * 200) + 1,

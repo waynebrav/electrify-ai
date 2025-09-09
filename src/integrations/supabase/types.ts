@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -82,6 +82,42 @@ export type Database = {
           orders_count?: number
           total_revenue?: number
           total_users?: number
+        }
+        Relationships: []
+      }
+      admin_notifications: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          message: string
+          start_date: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          start_date?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          start_date?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1013,6 +1049,10 @@ export type Database = {
           description: string
           flash_sale_end: string | null
           id: string
+          image_url: string | null
+          image_url_1: string | null
+          image_url_2: string | null
+          image_url_3: string | null
           is_bestseller: boolean | null
           is_featured: boolean | null
           is_flash_sale: boolean | null
@@ -1043,6 +1083,10 @@ export type Database = {
           description: string
           flash_sale_end?: string | null
           id?: string
+          image_url?: string | null
+          image_url_1?: string | null
+          image_url_2?: string | null
+          image_url_3?: string | null
           is_bestseller?: boolean | null
           is_featured?: boolean | null
           is_flash_sale?: boolean | null
@@ -1073,6 +1117,10 @@ export type Database = {
           description?: string
           flash_sale_end?: string | null
           id?: string
+          image_url?: string | null
+          image_url_1?: string | null
+          image_url_2?: string | null
+          image_url_3?: string | null
           is_bestseller?: boolean | null
           is_featured?: boolean | null
           is_flash_sale?: boolean | null
@@ -1569,23 +1617,23 @@ export type Database = {
       authenticate_admin: {
         Args: { admin_email: string; admin_password: string }
         Returns: {
-          id: string
           email: string
           first_name: string
+          id: string
           last_name: string
         }[]
       }
       get_admin_dashboard_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
-          total_users: number
-          total_revenue: number
-          orders_count: number
           active_products: number
-          user_growth_percentage: number
-          revenue_growth_percentage: number
+          orders_count: number
           orders_growth_percentage: number
           products_growth_percentage: number
+          revenue_growth_percentage: number
+          total_revenue: number
+          total_users: number
+          user_growth_percentage: number
         }[]
       }
       is_admin: {

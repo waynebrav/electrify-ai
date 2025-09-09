@@ -682,15 +682,29 @@ const ProductDetail = () => {
               <TabsContent value="video" className="mt-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Product Video</h3>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                    <video 
-                      controls 
-                      className="w-full h-full object-cover"
-                      poster={product.image_url || product.image_url_1}
-                    >
-                      <source src={product.video_url} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    {product.video_url.includes('youtube.com') || product.video_url.includes('youtu.be') ? (
+                      <iframe
+                        src={product.video_url
+                          .replace('watch?v=', 'embed/')
+                          .replace('youtu.be/', 'youtube.com/embed/')
+                          .replace('youtube.com/watch?v=', 'youtube.com/embed/')}
+                        className="w-full h-full"
+                        allowFullScreen
+                        title="Product Video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    ) : (
+                      <video 
+                        controls 
+                        className="w-full h-full object-cover"
+                        poster={product.image_url || product.image_url_1}
+                        preload="metadata"
+                      >
+                        <source src={product.video_url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
                   </div>
                 </div>
               </TabsContent>
