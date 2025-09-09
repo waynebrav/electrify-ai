@@ -69,7 +69,7 @@ serve(async (req) => {
     // Fetch all available products
     const { data: allProducts } = await supabase
       .from('products')
-      .select('id, name, description, brand, price, is_featured')
+      .select('id, name, description, brand, price, is_featured, is_new, stock_quantity, image_url, image_url_1, image_url_2, image_url_3, original_price')
       .eq('status', 'Active')
       .gt('stock_quantity', 0)
       .limit(50);

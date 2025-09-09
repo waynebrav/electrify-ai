@@ -43,26 +43,67 @@ const ProductRecommendations = ({ productId, className = "" }: ProductRecommenda
     try {
       setIsLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('product-recommendations', {
-        body: {
-          userId: user?.id || null,
-          productId: productId || null,
-          userPreferences: profile?.preferences || null
+      // Fallback to direct database query if the function fails or returns no data
+      let formattedRecommendations = [];
+      
+      try {
+        const { data, error } = await supabase.functions.invoke('product-recommendations', {
+          body: {
+            userId: user?.id || null,
+            productId: productId || null,
+            userPreferences: profile?.preferences || null
+          }
+        });
+
+        if (!error && data?.recommendations?.length > 0) {
+          // Format the recommendations from the function
+          formattedRecommendations = data.recommendations.map((product: any) => ({
+            ...product,
+            image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
+            rating: 4 + Math.random() * 0.9,
+            reviewCount: Math.floor(Math.random() * 200) + 50,
+            isNew: product.is_new || Math.random() > 0.7,
+            isFeatured: product.is_featured || false,
+            stockQuantity: product.stock_quantity || Math.floor(Math.random() * 50) + 10
+          }));
         }
-      });
+      } catch (functionError) {
+        console.warn('Function call failed, falling back to direct query:', functionError);
+      }
 
-      if (error) throw error;
+      // If function didn't return results, fetch directly from database
+      if (formattedRecommendations.length === 0) {
+        const { data: directProducts, error: directError } = await supabase
+          .from('products')
+          .select(`
+            id, 
+            name, 
+            description,
+            price, 
+            original_price,
+            is_new,
+            is_featured,
+            stock_quantity,
+            image_url,
+            image_url_1,
+            image_url_2,
+            image_url_3
+          `)
+          .eq('status', 'Active')
+          .limit(8);
 
-      // Format the recommendations to match the expected structure
-      const formattedRecommendations = (data.recommendations || []).map((product: any) => ({
-        ...product,
-        image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
-        rating: 4 + Math.random() * 0.9,
-        reviewCount: Math.floor(Math.random() * 200) + 50,
-        isNew: Math.random() > 0.7,
-        isFeatured: false,
-        stockQuantity: Math.floor(Math.random() * 50) + 10
-      }));
+        if (!directError && directProducts) {
+          formattedRecommendations = directProducts.map((product: any) => ({
+            ...product,
+            image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
+            rating: 4 + Math.random() * 0.9,
+            reviewCount: Math.floor(Math.random() * 200) + 50,
+            isNew: product.is_new || Math.random() > 0.7,
+            isFeatured: product.is_featured || false,
+            stockQuantity: product.stock_quantity || Math.floor(Math.random() * 50) + 10
+          }));
+        }
+      }
 
       setRecommendations(formattedRecommendations);
     } catch (error) {
