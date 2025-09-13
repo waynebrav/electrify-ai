@@ -77,6 +77,9 @@ const Navbar = () => {
               <Link to="/products" className="text-gray-700 dark:text-gray-300 hover:text-electrify-600 dark:hover:text-electrify-400 px-3 py-2 text-sm font-medium">
                 Products
               </Link>
+              <Link to="/flash-sales" className="text-gray-700 dark:text-gray-300 hover:text-electrify-600 dark:hover:text-electrify-400 px-3 py-2 text-sm font-medium">
+                Flash Sales
+              </Link>
               <Link to="/ar-room" className="text-gray-700 dark:text-gray-300 hover:text-electrify-600 dark:hover:text-electrify-400 px-3 py-2 text-sm font-medium">
                 AR Room
               </Link>

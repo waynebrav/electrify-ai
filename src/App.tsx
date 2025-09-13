@@ -24,6 +24,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import UserProfile from "./pages/UserProfile";
 import OrderHistory from "./pages/OrderHistory";
 import AugmentedViewingRoom from "./pages/AugmentedViewingRoom";
+import FlashSales from "./pages/FlashSales";
 import UserPreferencesSurvey from "./components/UserPreferencesSurvey";
 import BuildSetup from "./pages/BuildSetup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -92,6 +93,7 @@ const App = () => {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/products" element={<Products />} />
+                <Route path="/flash-sales" element={<FlashSales />} />
                 <Route path="/category/:slug" element={<Category />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/products/:slug" element={<ProductDetail />} />

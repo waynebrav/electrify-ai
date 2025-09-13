@@ -9,6 +9,7 @@ import NewsletterSection from "@/components/NewsletterSection";
 import LimitedOfferNotification from "@/components/LimitedOfferNotification";
 import ProductRecommendations from "@/components/ProductRecommendations";
 import QuickAddToCart from "@/components/QuickAddToCart";
+import UserNotifications from "@/components/UserNotifications";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Award, Shield } from "lucide-react";
@@ -69,6 +70,11 @@ const Index = () => {
         </section>
         
         <LimitedOfferNotification />
+        
+        {/* User Notifications */}
+        <div className="container">
+          <UserNotifications />
+        </div>
         
         {/* AI Recommended Products Section - Above Featured Products */}
         <section className="container py-12">

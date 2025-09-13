@@ -298,10 +298,6 @@ const Category = () => {
           {/* Flash Sales Section */}
           <FlashSalesSection />
           
-          {/* AI Recommendations */}
-          <div className="mb-8">
-            <ProductRecommendations />
-          </div>
           
           {/* Products Section */}
           <div className="mb-8">

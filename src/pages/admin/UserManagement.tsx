@@ -70,7 +70,7 @@ const UserManagement = () => {
       // Get all users from profiles table, including auth_provider
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*, auth_provider");
+        .select("id, email, first_name, last_name, created_at, auth_provider");
 
       if (profilesError) throw profilesError;
 

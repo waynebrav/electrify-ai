@@ -5,12 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, LineChart, BoxIcon, Loader2, ArrowLeft, Package, Bell } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, LineChart, BoxIcon, Loader2, ArrowLeft, Package, Bell, Zap, Ticket } from "lucide-react";
 import UserManagement from "./admin/UserManagement";
 import ProductManagement from "./admin/ProductManagement";
 import SettingsPanel from "./admin/SettingsPanel";
 import OrderManagement from "@/components/admin/OrderManagement";
 import NotificationManagement from "@/components/admin/NotificationManagement";
+import VoucherManagement from "@/components/admin/VoucherManagement";
+import FlashSaleManagement from "./admin/FlashSaleManagement";
 import { useToast } from "@/components/ui/use-toast";
 import {
   ChartContainer,
@@ -249,6 +251,34 @@ const AdminDashboard = () => {
                 Notifications
               </Link>
             </li>
+            <li>
+              <Link 
+                to="/admin/vouchers" 
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  activeTab === "vouchers" 
+                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-r-2 border-blue-600" 
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+                onClick={() => setActiveTab("vouchers")}
+              >
+                <Ticket className="mr-3 h-5 w-5" />
+                Vouchers
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/admin/flash-sales" 
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  activeTab === "flash-sales" 
+                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-r-2 border-blue-600" 
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+                onClick={() => setActiveTab("flash-sales")}
+              >
+                <Zap className="mr-3 h-5 w-5" />
+                Flash Sales
+              </Link>
+            </li>
           </ul>
           
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
@@ -275,6 +305,8 @@ const AdminDashboard = () => {
           <Route path="/inventory" element={<InventoryManagement />} />
           <Route path="/settings" element={<SettingsPanel />} />
           <Route path="/notifications" element={<NotificationManagement />} />
+          <Route path="/vouchers" element={<VoucherManagement />} />
+          <Route path="/flash-sales" element={<FlashSaleManagement />} />
         </Routes>
       </div>
     </div>
