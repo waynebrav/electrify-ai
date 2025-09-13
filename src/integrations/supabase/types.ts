@@ -1047,7 +1047,10 @@ export type Database = {
           created_at: string | null
           currency: string
           description: string
+          flash_sale_category: string | null
+          flash_sale_discount_percentage: number | null
           flash_sale_end: string | null
+          flash_sale_time_slot: string | null
           id: string
           image_url: string | null
           image_url_1: string | null
@@ -1081,7 +1084,10 @@ export type Database = {
           created_at?: string | null
           currency?: string
           description: string
+          flash_sale_category?: string | null
+          flash_sale_discount_percentage?: number | null
           flash_sale_end?: string | null
+          flash_sale_time_slot?: string | null
           id?: string
           image_url?: string | null
           image_url_1?: string | null
@@ -1115,7 +1121,10 @@ export type Database = {
           created_at?: string | null
           currency?: string
           description?: string
+          flash_sale_category?: string | null
+          flash_sale_discount_percentage?: number | null
           flash_sale_end?: string | null
+          flash_sale_time_slot?: string | null
           id?: string
           image_url?: string | null
           image_url_1?: string | null
@@ -1164,6 +1173,9 @@ export type Database = {
           address: string | null
           auth_provider: string | null
           avatar_url: string | null
+          ban_reason: string | null
+          banned_at: string | null
+          banned_by: string | null
           city: string | null
           country: string | null
           created_at: string | null
@@ -1171,6 +1183,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          is_banned: boolean | null
           last_name: string | null
           phone: string | null
           postal_code: string | null
@@ -1182,6 +1195,9 @@ export type Database = {
           address?: string | null
           auth_provider?: string | null
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
+          banned_by?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
@@ -1189,6 +1205,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          is_banned?: boolean | null
           last_name?: string | null
           phone?: string | null
           postal_code?: string | null
@@ -1200,6 +1217,9 @@ export type Database = {
           address?: string | null
           auth_provider?: string | null
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
+          banned_by?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
@@ -1207,6 +1227,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          is_banned?: boolean | null
           last_name?: string | null
           phone?: string | null
           postal_code?: string | null
@@ -1335,6 +1356,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          type: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          type?: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          type?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
       }
       user_coupon_usage: {
         Row: {

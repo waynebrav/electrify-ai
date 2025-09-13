@@ -23,6 +23,9 @@ interface Product {
   image_url_1: string | null;
   is_flash_sale: boolean;
   flash_sale_end: string | null;
+  flash_sale_discount_percentage: number;
+  flash_sale_category: string | null;
+  flash_sale_time_slot: string | null;
   stock_quantity: number;
   status: string;
 }
@@ -33,6 +36,9 @@ const FlashSaleManagement = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [flashSaleEnd, setFlashSaleEnd] = useState("");
+  const [discountPercentage, setDiscountPercentage] = useState(10);
+  const [selectedCategory, setSelectedCategory] = useState("electronics");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("8-10");
 
   // Fetch all products
   const { data: allProducts } = useQuery({
@@ -40,7 +46,7 @@ const FlashSaleManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, original_price, image_url, image_url_1, is_flash_sale, flash_sale_end, stock_quantity, status")
+        .select("id, name, price, original_price, image_url, image_url_1, is_flash_sale, flash_sale_end, flash_sale_discount_percentage, flash_sale_category, flash_sale_time_slot, stock_quantity, status")
         .eq("status", "Active")
         .order("name");
 
@@ -55,7 +61,7 @@ const FlashSaleManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, original_price, image_url, image_url_1, is_flash_sale, flash_sale_end, stock_quantity, status")
+        .select("id, name, price, original_price, image_url, image_url_1, is_flash_sale, flash_sale_end, flash_sale_discount_percentage, flash_sale_category, flash_sale_time_slot, stock_quantity, status")
         .eq("is_flash_sale", true)
         .order("flash_sale_end", { ascending: true });
 
@@ -66,12 +72,21 @@ const FlashSaleManagement = () => {
 
   // Add products to flash sale
   const addToFlashSaleMutation = useMutation({
-    mutationFn: async ({ productIds, endDate }: { productIds: string[]; endDate: string }) => {
+    mutationFn: async ({ productIds, endDate, discount, category, timeSlot }: { 
+      productIds: string[]; 
+      endDate: string; 
+      discount: number;
+      category: string;
+      timeSlot: string;
+    }) => {
       const { error } = await supabase
         .from("products")
         .update({
           is_flash_sale: true,
           flash_sale_end: endDate,
+          flash_sale_discount_percentage: discount,
+          flash_sale_category: category,
+          flash_sale_time_slot: timeSlot,
         })
         .in("id", productIds);
 
@@ -83,6 +98,7 @@ const FlashSaleManagement = () => {
       setShowAddDialog(false);
       setSelectedProducts([]);
       setFlashSaleEnd("");
+      setDiscountPercentage(10);
       toast({ title: "Success", description: "Products added to flash sale" });
     },
     onError: (error) => {
@@ -98,6 +114,9 @@ const FlashSaleManagement = () => {
         .update({
           is_flash_sale: false,
           flash_sale_end: null,
+          flash_sale_discount_percentage: 0,
+          flash_sale_category: null,
+          flash_sale_time_slot: null,
         })
         .eq("id", productId);
 
@@ -133,14 +152,17 @@ const FlashSaleManagement = () => {
   });
 
   const handleAddToFlashSale = () => {
-    if (selectedProducts.length === 0 || !flashSaleEnd) {
-      toast({ title: "Error", description: "Please select products and set end date", variant: "destructive" });
+    if (selectedProducts.length === 0 || !flashSaleEnd || discountPercentage <= 0) {
+      toast({ title: "Error", description: "Please select products, set end date, and discount percentage", variant: "destructive" });
       return;
     }
 
     addToFlashSaleMutation.mutate({
       productIds: selectedProducts,
       endDate: new Date(flashSaleEnd).toISOString(),
+      discount: discountPercentage,
+      category: selectedCategory,
+      timeSlot: selectedTimeSlot,
     });
   };
 
@@ -192,15 +214,64 @@ const FlashSaleManagement = () => {
             </DialogHeader>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="end-date">Flash Sale End Date & Time*</Label>
-                <Input
-                  id="end-date"
-                  type="datetime-local"
-                  value={flashSaleEnd}
-                  onChange={(e) => setFlashSaleEnd(e.target.value)}
-                  min={new Date().toISOString().slice(0, 16)}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="end-date">Flash Sale End Date & Time*</Label>
+                  <Input
+                    id="end-date"
+                    type="datetime-local"
+                    value={flashSaleEnd}
+                    onChange={(e) => setFlashSaleEnd(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="discount">Discount Percentage*</Label>
+                  <Input
+                    id="discount"
+                    type="number"
+                    value={discountPercentage}
+                    onChange={(e) => setDiscountPercentage(Number(e.target.value))}
+                    min={1}
+                    max={90}
+                    placeholder="e.g., 25"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category*</Label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="electronics">Electronics</SelectItem>
+                      <SelectItem value="fashion">Fashion</SelectItem>
+                      <SelectItem value="home">Home & Garden</SelectItem>
+                      <SelectItem value="sports">Sports & Fitness</SelectItem>
+                      <SelectItem value="beauty">Beauty & Personal Care</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="time-slot">Time Slot*</Label>
+                  <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="8-10">8:00 AM - 10:00 AM</SelectItem>
+                      <SelectItem value="10-12">10:00 AM - 12:00 PM</SelectItem>
+                      <SelectItem value="12-14">12:00 PM - 2:00 PM</SelectItem>
+                      <SelectItem value="14-16">2:00 PM - 4:00 PM</SelectItem>
+                      <SelectItem value="16-18">4:00 PM - 6:00 PM</SelectItem>
+                      <SelectItem value="18-20">6:00 PM - 8:00 PM</SelectItem>
+                      <SelectItem value="20-22">8:00 PM - 10:00 PM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -257,7 +328,7 @@ const FlashSaleManagement = () => {
               </Button>
               <Button 
                 onClick={handleAddToFlashSale}
-                disabled={selectedProducts.length === 0 || !flashSaleEnd}
+                disabled={selectedProducts.length === 0 || !flashSaleEnd || discountPercentage <= 0}
               >
                 Add to Flash Sale
               </Button>
@@ -316,7 +387,8 @@ const FlashSaleManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
-                <TableHead>Price</TableHead>
+                <TableHead>Price/Discount</TableHead>
+                <TableHead>Category/Time</TableHead>
                 <TableHead>End Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -346,6 +418,17 @@ const FlashSaleManagement = () => {
                           KES {product.original_price}
                         </p>
                       )}
+                      {product.flash_sale_discount_percentage > 0 && (
+                        <p className="text-sm text-green-600 font-medium">
+                          {product.flash_sale_discount_percentage}% OFF
+                        </p>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="text-sm capitalize">{product.flash_sale_category || 'N/A'}</p>
+                      <p className="text-xs text-muted-foreground">{product.flash_sale_time_slot || 'N/A'}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -388,9 +471,9 @@ const FlashSaleManagement = () => {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              )) || (
+                )) || (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     No flash sale products found. Add some products to get started.
                   </TableCell>
                 </TableRow>

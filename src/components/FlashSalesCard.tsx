@@ -6,6 +6,7 @@ import { ShoppingCart, Clock } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FlashSaleProductProps {
   id: string;
@@ -15,6 +16,7 @@ interface FlashSaleProductProps {
   image: string;
   endDate: string;
   percentageSold: number;
+  discountPercentage?: number;
   onAddToCart?: () => void;
 }
 
@@ -26,6 +28,7 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
   image,
   endDate,
   percentageSold,
+  discountPercentage = 0,
   onAddToCart
 }) => {
   const [timeLeft, setTimeLeft] = useState<{
@@ -83,10 +86,76 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
   const stockQuantity = 100 - percentageSold; // Calculate remaining stock
   
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onAddToCart && !isExpired && stockQuantity > 0) onAddToCart();
+    
+    if (isExpired || stockQuantity <= 0) return;
+    
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Redirect to login if not authenticated
+        window.location.href = '/login';
+        return;
+      }
+
+      // Get or create cart
+      let { data: cart } = await supabase
+        .from('carts')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!cart) {
+        const { data: newCart, error: cartError } = await supabase
+          .from('carts')
+          .insert({ user_id: user.id })
+          .select('id')
+          .single();
+        
+        if (cartError) throw cartError;
+        cart = newCart;
+      }
+
+      // Check if item already exists in cart
+      const { data: existingItem } = await supabase
+        .from('cart_items')
+        .select('id, quantity')
+        .eq('cart_id', cart.id)
+        .eq('product_id', id)
+        .single();
+
+      if (existingItem) {
+        // Update quantity
+        const { error } = await supabase
+          .from('cart_items')
+          .update({ quantity: existingItem.quantity + 1 })
+          .eq('id', existingItem.id);
+        
+        if (error) throw error;
+      } else {
+        // Add new item
+        const { error } = await supabase
+          .from('cart_items')
+          .insert({
+            cart_id: cart.id,
+            product_id: id,
+            quantity: 1
+          });
+        
+        if (error) throw error;
+      }
+
+      // Show success toast or notification
+      console.log('Item added to cart successfully');
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+    
+    if (onAddToCart) onAddToCart();
   };
 
   const formatCurrency = (amount: number) => {
@@ -97,10 +166,10 @@ const FlashSaleCard: React.FC<FlashSaleProductProps> = ({
     <Link to={`/product/${id}`} className="block">
       <div className="relative overflow-hidden rounded-lg border border-border bg-card p-4 transition-all hover:shadow-lg">
         {/* Discount badge */}
-        {originalPrice && (
+        {(originalPrice || discountPercentage > 0) && (
           <div className="absolute top-2 left-2 z-10">
             <Badge variant="destructive" className="text-xs font-bold">
-              {discount}% OFF
+              {discountPercentage > 0 ? discountPercentage : discount}% OFF
             </Badge>
           </div>
         )}

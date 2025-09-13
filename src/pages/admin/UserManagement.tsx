@@ -43,6 +43,8 @@ interface User {
   profile?: {
     first_name: string | null;
     last_name: string | null;
+    is_banned?: boolean;
+    ban_reason?: string | null;
   };
 }
 
@@ -67,10 +69,10 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Get all users from profiles table, including auth_provider
+      // Get all users from profiles table, including auth_provider and ban status
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, email, first_name, last_name, created_at, auth_provider");
+        .select("id, email, first_name, last_name, created_at, auth_provider, is_banned, ban_reason");
 
       if (profilesError) throw profilesError;
 
@@ -95,6 +97,8 @@ const UserManagement = () => {
           profile: {
             first_name: profile.first_name,
             last_name: profile.last_name,
+            is_banned: profile.is_banned,
+            ban_reason: profile.ban_reason,
           },
         };
       });
@@ -273,6 +277,49 @@ const UserManagement = () => {
     }
   };
 
+  const handleBanUser = async (userId: string, ban: boolean, reason?: string) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          is_banned: ban,
+          ban_reason: ban ? reason : null,
+          banned_at: ban ? new Date().toISOString() : null,
+          banned_by: ban ? currentUser?.id : null,
+        })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      // Update UI
+      setUsers(users.map(user => {
+        if (user.id === userId) {
+          return { 
+            ...user, 
+            profile: { 
+              ...user.profile, 
+              is_banned: ban,
+              ban_reason: ban ? reason : null 
+            } 
+          };
+        }
+        return user;
+      }));
+
+      toast({
+        title: "Success",
+        description: `User ${ban ? "has been banned" : "has been unbanned"}`,
+      });
+    } catch (error: any) {
+      console.error("Error updating user ban status:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user ban status",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Restore search and filter logic
   const filteredUsers = users.filter(user => {
     const query = searchQuery.toLowerCase();
@@ -404,6 +451,7 @@ const UserManagement = () => {
               isLoading={isLoading}
               onDeleteUser={handleDeleteUser}
               onToggleAdmin={handleToggleAdmin}
+              onBanUser={handleBanUser}
               currentUserId={currentUser?.id || ''}
             />
           </TabsContent>
@@ -414,6 +462,7 @@ const UserManagement = () => {
               isLoading={isLoading}
               onDeleteUser={handleDeleteUser}
               onToggleAdmin={handleToggleAdmin}
+              onBanUser={handleBanUser}
               currentUserId={currentUser?.id || ''}
             />
           </TabsContent>
@@ -424,6 +473,7 @@ const UserManagement = () => {
               isLoading={isLoading}
               onDeleteUser={handleDeleteUser}
               onToggleAdmin={handleToggleAdmin}
+              onBanUser={handleBanUser}
               currentUserId={currentUser?.id || ''}
             />
           </TabsContent>
@@ -438,10 +488,11 @@ interface UserListProps {
   isLoading: boolean;
   onDeleteUser: (id: string) => void;
   onToggleAdmin: (id: string, isAdmin: boolean) => void;
+  onBanUser: (id: string, ban: boolean, reason?: string) => void;
   currentUserId: string;
 }
 
-const UserList = ({ users, isLoading, onDeleteUser, onToggleAdmin, currentUserId }: UserListProps) => {
+const UserList = ({ users, isLoading, onDeleteUser, onToggleAdmin, onBanUser, currentUserId }: UserListProps) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -482,14 +533,21 @@ const UserList = ({ users, isLoading, onDeleteUser, onToggleAdmin, currentUserId
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex gap-1">
-                {user.roles.includes('admin') ? (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                    Admin
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                    Customer
+              <div className="flex gap-1 flex-col">
+                <div className="flex gap-1">
+                  {user.roles.includes('admin') ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                      Admin
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                      Customer
+                    </span>
+                  )}
+                </div>
+                {user.profile?.is_banned && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                    Banned
                   </span>
                 )}
               </div>
@@ -517,6 +575,28 @@ const UserList = ({ users, isLoading, onDeleteUser, onToggleAdmin, currentUserId
                       Make Admin
                     </DropdownMenuItem>
                   )}
+                  
+                  {user.profile?.is_banned ? (
+                    <DropdownMenuItem 
+                      onClick={() => onBanUser(user.id, false)}
+                      disabled={user.id === currentUserId}
+                      className="text-green-600 focus:text-green-600"
+                    >
+                      Unban User
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        const reason = prompt("Enter ban reason:");
+                        if (reason) onBanUser(user.id, true, reason);
+                      }}
+                      disabled={user.id === currentUserId}
+                      className="text-orange-600 focus:text-orange-600"
+                    >
+                      Ban User
+                    </DropdownMenuItem>
+                  )}
+                  
                   <DropdownMenuItem 
                     onClick={() => onDeleteUser(user.id)}
                     disabled={user.id === currentUserId}

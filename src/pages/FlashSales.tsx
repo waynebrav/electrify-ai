@@ -7,6 +7,7 @@ import FlashSalesCard from "@/components/FlashSalesCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Zap, Clock, TrendingUp } from "lucide-react";
 
 interface Product {
@@ -17,16 +18,40 @@ interface Product {
   image: string;
   endDate: string;
   percentageSold: number;
+  discountPercentage: number;
 }
+
+// Time slots for flash sales
+const TIME_SLOTS = [
+  { value: "8-10", label: "8:00 AM - 10:00 AM" },
+  { value: "10-12", label: "10:00 AM - 12:00 PM" },
+  { value: "12-14", label: "12:00 PM - 2:00 PM" },
+  { value: "14-16", label: "2:00 PM - 4:00 PM" },
+  { value: "16-18", label: "4:00 PM - 6:00 PM" },
+  { value: "18-20", label: "6:00 PM - 8:00 PM" },
+  { value: "20-22", label: "8:00 PM - 10:00 PM" },
+];
+
+// Categories for flash sales
+const FLASH_CATEGORIES = [
+  { value: "all", label: "All Categories" },
+  { value: "electronics", label: "Electronics" },
+  { value: "fashion", label: "Fashion" },
+  { value: "home", label: "Home & Garden" },
+  { value: "sports", label: "Sports & Fitness" },
+  { value: "beauty", label: "Beauty & Personal Care" },
+];
 
 const FlashSales = () => {
   const [sortBy, setSortBy] = useState("ending-soon");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { data: flashSaleProducts, isLoading } = useQuery({
-    queryKey: ["flash-sale-products", sortBy],
+    queryKey: ["flash-sale-products", sortBy, selectedTimeSlot, selectedCategory],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("products")
           .select(`
             id, 
@@ -39,11 +64,26 @@ const FlashSales = () => {
             image_url_3,
             flash_sale_end,
             stock_quantity,
-            is_flash_sale
+            is_flash_sale,
+            flash_sale_discount_percentage,
+            flash_sale_category,
+            flash_sale_time_slot
           `)
           .eq("is_flash_sale", true)
           .eq("status", "Active")
           .not("flash_sale_end", "is", null);
+
+        // Filter by time slot if selected
+        if (selectedTimeSlot !== "all") {
+          query = query.eq("flash_sale_time_slot", selectedTimeSlot);
+        }
+
+        // Filter by category if selected
+        if (selectedCategory !== "all") {
+          query = query.eq("flash_sale_category", selectedCategory);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error("Error fetching flash sale products:", error);
@@ -63,6 +103,7 @@ const FlashSales = () => {
             image: product.image_url || product.image_url_1 || product.image_url_2 || product.image_url_3 || '/placeholder.svg',
             endDate: product.flash_sale_end,
             percentageSold: Math.floor(Math.random() * 80) + 10, // Mock data for percentage sold
+            discountPercentage: product.flash_sale_discount_percentage || 0,
           }));
 
         // Sort products based on selected option
@@ -124,21 +165,52 @@ const FlashSales = () => {
           </div>
         </div>
 
+        {/* Time Slot Navigation */}
+        <div className="mb-8">
+          <Tabs value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+              <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
+              {TIME_SLOTS.map((slot) => (
+                <TabsTrigger key={slot.value} value={slot.value} className="text-xs">
+                  {slot.value.replace('-', '-')}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
         {/* Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Sort by:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ending-soon">Ending Soon</SelectItem>
-                <SelectItem value="most-popular">Most Popular</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Category:</span>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FLASH_CATEGORIES.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Sort by:</span>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ending-soon">Ending Soon</SelectItem>
+                  <SelectItem value="most-popular">Most Popular</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 

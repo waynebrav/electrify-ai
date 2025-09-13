@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useSystemSettings } from '@/hooks/useSystemSettings';
 
 export interface Currency {
   code: string;
@@ -64,8 +65,9 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrencyState] = useState<Currency>(SUPPORTED_CURRENCIES[0]); // Default to KES
   const [isInitialized, setIsInitialized] = useState(false);
+  const { data: systemSettings } = useSystemSettings();
 
-  // Load saved currency from localStorage
+  // Load saved currency from localStorage or use system default
   useEffect(() => {
     try {
       const savedCurrency = localStorage.getItem('selected_currency');
@@ -74,13 +76,19 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (found) {
           setCurrencyState(found);
         }
+      } else if (systemSettings?.default_currency) {
+        // Use system default currency if no user preference
+        const defaultCurrency = SUPPORTED_CURRENCIES.find(c => c.code === systemSettings.default_currency);
+        if (defaultCurrency) {
+          setCurrencyState(defaultCurrency);
+        }
       }
     } catch (error) {
       console.error('Error loading saved currency:', error);
     } finally {
       setIsInitialized(true);
     }
-  }, []);
+  }, [systemSettings]);
 
   const setCurrency = (newCurrency: Currency) => {
     setCurrencyState(newCurrency);

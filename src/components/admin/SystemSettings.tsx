@@ -104,22 +104,65 @@ const SystemSettings = () => {
     }
   ];
 
-  // Initialize settings with defaults
+  // Load settings from database
   React.useEffect(() => {
-    const initialSettings: Record<string, any> = {};
-    defaultSettings.forEach(setting => {
-      initialSettings[setting.key] = setting.type === 'boolean' 
-        ? setting.value === 'true' 
-        : setting.value;
-    });
-    setSettings(initialSettings);
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('system_settings')
+          .select('key, value, type');
+        
+        if (error) throw error;
+
+        const loadedSettings: Record<string, any> = {};
+        
+        // First, set defaults
+        defaultSettings.forEach(setting => {
+          loadedSettings[setting.key] = setting.type === 'boolean' 
+            ? setting.value === 'true' 
+            : setting.value;
+        });
+
+        // Then override with database values
+        data?.forEach(setting => {
+          if (setting.type === 'boolean') {
+            loadedSettings[setting.key] = setting.value === 'true';
+          } else {
+            loadedSettings[setting.key] = setting.value;
+          }
+        });
+
+        setSettings(loadedSettings);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        // Fallback to defaults
+        const fallbackSettings: Record<string, any> = {};
+        defaultSettings.forEach(setting => {
+          fallbackSettings[setting.key] = setting.type === 'boolean' 
+            ? setting.value === 'true' 
+            : setting.value;
+        });
+        setSettings(fallbackSettings);
+      }
+    };
+
+    loadSettings();
   }, []);
 
   const saveSettingsMutation = useMutation({
     mutationFn: async (settingsData: Record<string, any>) => {
-      // For now, we'll save to localStorage since we don't have a settings table
-      // In a real implementation, you'd save to a database table
-      localStorage.setItem('system_settings', JSON.stringify(settingsData));
+      // Save to database
+      const updates = Object.entries(settingsData).map(([key, value]) => ({
+        key,
+        value: String(value),
+        type: defaultSettings.find(s => s.key === key)?.type || 'text'
+      }));
+
+      const { error } = await supabase
+        .from('system_settings')
+        .upsert(updates, { onConflict: 'key' });
+
+      if (error) throw error;
       return settingsData;
     },
     onSuccess: () => {

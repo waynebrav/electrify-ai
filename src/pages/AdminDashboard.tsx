@@ -12,6 +12,7 @@ import SettingsPanel from "./admin/SettingsPanel";
 import OrderManagement from "@/components/admin/OrderManagement";
 import NotificationManagement from "@/components/admin/NotificationManagement";
 import VoucherManagement from "@/components/admin/VoucherManagement";
+import VoucherCodeManagement from "@/components/admin/VoucherCodeManagement";
 import FlashSaleManagement from "./admin/FlashSaleManagement";
 import { useToast } from "@/components/ui/use-toast";
 import {
