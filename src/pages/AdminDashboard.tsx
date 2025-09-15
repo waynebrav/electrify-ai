@@ -14,6 +14,7 @@ import NotificationManagement from "@/components/admin/NotificationManagement";
 import VoucherManagement from "@/components/admin/VoucherManagement";
 import VoucherCodeManagement from "@/components/admin/VoucherCodeManagement";
 import FlashSaleManagement from "./admin/FlashSaleManagement";
+import PayPalManagement from "@/components/admin/PayPalManagement";
 import { useToast } from "@/components/ui/use-toast";
 import {
   ChartContainer,
@@ -280,6 +281,20 @@ const AdminDashboard = () => {
                 Flash Sales
               </Link>
             </li>
+            <li>
+              <Link 
+                to="/admin/paypal" 
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  activeTab === "paypal" 
+                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-r-2 border-blue-600" 
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+                onClick={() => setActiveTab("paypal")}
+              >
+                <Ticket className="mr-3 h-5 w-5" />
+                PayPal
+              </Link>
+            </li>
           </ul>
           
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
@@ -308,6 +323,7 @@ const AdminDashboard = () => {
           <Route path="/notifications" element={<NotificationManagement />} />
           <Route path="/vouchers" element={<VoucherManagement />} />
           <Route path="/flash-sales" element={<FlashSaleManagement />} />
+          <Route path="/paypal" element={<PayPalManagement />} />
         </Routes>
       </div>
     </div>

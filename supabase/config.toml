@@ -7,3 +7,9 @@ enabled = true
 client_id = "" # You'll need to set this in the Supabase dashboard
 secret = "" # You'll need to set this in the Supabase dashboard
 redirect_uri = "https://yhlxoypsnlraplpifrfg.supabase.co/auth/v1/callback"
+
+[functions.paypal-create-payment]
+verify_jwt = false
+
+[functions.paypal-execute-payment]
+verify_jwt = false

@@ -267,12 +267,33 @@ const Checkout = () => {
           return;
         }
       } else if (selectedPaymentMethod === "paypal") {
-        toast({
-          title: "PayPal Payment",
-          description: "You will be redirected to PayPal to complete your payment.",
-        });
-        // In a real implementation, you would redirect to PayPal here
-        // For now, we'll just show the confirmation page with PayPal details
+        try {
+          const { data: paypalResponse, error: paypalError } = await supabase.functions.invoke('paypal-create-payment', {
+            body: {
+              orderId: order.id,
+              amount: totalAmount,
+              currency: "USD" // You can make this dynamic based on user preference
+            }
+          });
+
+          if (paypalError) throw paypalError;
+
+          if (paypalResponse.success) {
+            // Redirect to PayPal for approval
+            window.location.href = paypalResponse.approvalUrl;
+            return; // Exit function to prevent further navigation
+          } else {
+            throw new Error(paypalResponse.error || 'Failed to create PayPal payment');
+          }
+        } catch (paypalError) {
+          console.error('PayPal error:', paypalError);
+          toast({
+            title: "PayPal Error",
+            description: "Failed to initiate PayPal payment. Please try again or use another payment method.",
+            variant: "destructive",
+          });
+          return;
+        }
       } else if (selectedPaymentMethod === "cash") {
         toast({
           title: "Cash Payment Selected",
@@ -286,20 +307,22 @@ const Checkout = () => {
         });
       }
 
-      // For crypto payments or PayPal, pass additional parameters
+      // For crypto payments or other methods, pass additional parameters
       const queryParams = new URLSearchParams();
       
       if (selectedPaymentMethod === "bitcoin" || selectedPaymentMethod === "ethereum" || selectedPaymentMethod === "usdt") {
         queryParams.append("method", selectedPaymentMethod);
         // Mock address - in a real app this would be generated based on the selected cryptocurrency
         queryParams.append("address", "0x" + Math.random().toString(16).substring(2, 42));
-      } else if (selectedPaymentMethod === "paypal") {
-        queryParams.append("method", "paypal");
-        queryParams.append("paypal_email", "bravinemunialo@gmail.com");
       } else if (selectedPaymentMethod === "mpesa") {
         queryParams.append("method", "mpesa");
         queryParams.append("phone", phoneNumber);
+      } else if (selectedPaymentMethod === "cash") {
+        queryParams.append("method", "cash");
       }
+      
+      // For PayPal, don't navigate here as we redirect to PayPal
+      // This check is already handled above in the PayPal payment processing section
       
       navigate(`/order-confirmation/${order.id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
     } catch (error) {
@@ -476,8 +499,8 @@ const Checkout = () => {
                 {selectedPaymentMethod === "paypal" && (
                   <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You will be redirected to PayPal to complete your payment.
-                      Payments will be sent to: <strong>bravinemunialo@gmail.com</strong>
+                      You will be redirected to PayPal to complete your payment securely.
+                      After payment, you'll be redirected back to our site.
                     </p>
                   </div>
                 )}
