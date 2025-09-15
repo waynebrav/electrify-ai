@@ -924,6 +924,39 @@ export type Database = {
           },
         ]
       }
+      paypal_configurations: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          environment: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          environment: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_bundles: {
         Row: {
           created_at: string | null
