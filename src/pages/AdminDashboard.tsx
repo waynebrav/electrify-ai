@@ -15,6 +15,8 @@ import VoucherManagement from "@/components/admin/VoucherManagement";
 import VoucherCodeManagement from "@/components/admin/VoucherCodeManagement";
 import FlashSaleManagement from "./admin/FlashSaleManagement";
 import PayPalManagement from "@/components/admin/PayPalManagement";
+import { PaymentManagement } from "@/components/admin/PaymentManagement";
+import { RecentTransactions } from "@/components/admin/RecentTransactions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   ChartContainer,

@@ -46,7 +46,8 @@ serve(async (req) => {
       }
 
       // Redirect to a cancellation page or order page with error
-      const redirectUrl = `${Deno.env.get('SUPABASE_URL')}/order-confirmation?status=cancelled`;
+      const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('/functions/v1', '') || 'https://yhlxoypsnlraplpifrfg.supabase.co';
+      const redirectUrl = `${baseUrl.replace('supabase.co', 'lovable.app')}/order-confirmation?status=cancelled`;
       return new Response(null, {
         status: 302,
         headers: {
@@ -169,9 +170,10 @@ serve(async (req) => {
     console.log('PayPal payment processed successfully');
 
     // Redirect to success page
+    const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('/functions/v1', '') || 'https://yhlxoypsnlraplpifrfg.supabase.co';
     const redirectUrl = orderId 
-      ? `${Deno.env.get('SUPABASE_URL')}/order-confirmation/${orderId}?status=success&method=paypal`
-      : `${Deno.env.get('SUPABASE_URL')}/order-confirmation?status=success&method=paypal`;
+      ? `${baseUrl.replace('supabase.co', 'lovable.app')}/order-confirmation/${orderId}?status=success&method=paypal`
+      : `${baseUrl.replace('supabase.co', 'lovable.app')}/order-confirmation?status=success&method=paypal`;
       
     return new Response(null, {
       status: 302,
@@ -185,7 +187,8 @@ serve(async (req) => {
     console.error('Error in PayPal execute payment function:', error);
     
     // Redirect to error page
-    const redirectUrl = `${Deno.env.get('SUPABASE_URL')}/order-confirmation?status=error&error=${encodeURIComponent(error.message)}`;
+    const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('/functions/v1', '') || 'https://yhlxoypsnlraplpifrfg.supabase.co';
+    const redirectUrl = `${baseUrl.replace('supabase.co', 'lovable.app')}/order-confirmation?status=error&error=${encodeURIComponent(error.message)}`;
     return new Response(null, {
       status: 302,
       headers: {
