@@ -691,6 +691,39 @@ export type Database = {
         }
         Relationships: []
       }
+      mpesa_configurations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          environment: string
+          id: string
+          is_active: boolean
+          name: string
+          shortcode: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          environment: string
+          id?: string
+          is_active?: boolean
+          name: string
+          shortcode: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          shortcode?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string

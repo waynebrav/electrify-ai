@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CreditCard, Smartphone, Wallet, Trash2 } from 'lucide-react';
-import { PayPalManagement } from './PayPalManagement';
+import PayPalManagement from './PayPalManagement';
 
 interface MpesaConfig {
   id: string;
@@ -31,23 +31,36 @@ export const PaymentManagement = () => {
     environment: 'sandbox' as 'sandbox' | 'production',
   });
 
-  const { data: mpesaConfigs, isLoading: loadingMpesa } = useQuery({
+  const { data: mpesaConfigs = [], isLoading: loadingMpesa } = useQuery({
     queryKey: ['mpesa-configurations'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('mpesa_configurations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as MpesaConfig[];
+      try {
+        // Use direct database query without Supabase typing for custom table
+        const response = await fetch(`https://yhlxoypsnlraplpifrfg.supabase.co/rest/v1/mpesa_configurations?order=created_at.desc`, {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlobHhveXBzbmxyYXBscGlmcmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3OTI1NjQsImV4cCI6MjA2MjM2ODU2NH0.IS96VgQ6uZYVQh3ManQVTc_lpBK4B3NK1UBEaPiiE3A',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlobHhveXBzbmxyYXBscGlmcmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3OTI1NjQsImV4cCI6MjA2MjM2ODU2NH0.IS96VgQ6uZYVQh3ManQVTc_lpBK4B3NK1UBEaPiiE3A`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch configurations');
+        }
+        
+        const data = await response.json();
+        return data as MpesaConfig[];
+      } catch (error) {
+        console.error('Error fetching M-Pesa configs:', error);
+        return [] as MpesaConfig[];
+      }
     },
   });
 
   const createMpesaConfig = useMutation({
     mutationFn: async (config: typeof newMpesaConfig) => {
       const { data, error } = await supabase
-        .from('mpesa_configurations')
+        .from('mpesa_configurations' as any)
         .insert([config])
         .select()
         .single();
@@ -77,13 +90,13 @@ export const PaymentManagement = () => {
       // First, deactivate all other configs if this one is being activated
       if (isActive) {
         await supabase
-          .from('mpesa_configurations')
+          .from('mpesa_configurations' as any)
           .update({ is_active: false })
           .neq('id', id);
       }
 
       const { data, error } = await supabase
-        .from('mpesa_configurations')
+        .from('mpesa_configurations' as any)
         .update({ is_active: isActive })
         .eq('id', id)
         .select()
@@ -104,7 +117,7 @@ export const PaymentManagement = () => {
   const deleteMpesaConfig = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('mpesa_configurations')
+        .from('mpesa_configurations' as any)
         .delete()
         .eq('id', id);
 

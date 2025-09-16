@@ -267,6 +267,11 @@ const Checkout = () => {
           return;
         }
       } else if (selectedPaymentMethod === "paypal") {
+        toast({
+          title: "Proceeding to PayPal...",
+          description: "Please wait while we redirect you to PayPal",
+        });
+        
         try {
           const { data: paypalResponse, error: paypalError } = await supabase.functions.invoke('paypal-create-payment', {
             body: {

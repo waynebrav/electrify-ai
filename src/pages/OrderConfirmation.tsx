@@ -32,6 +32,7 @@ const OrderConfirmation = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const method = searchParams.get("method");
+  const status = searchParams.get("status");
   const address = searchParams.get("address");
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -46,6 +47,30 @@ const OrderConfirmation = () => {
       navigate("/login");
       return;
     }
+
+    // Show success toast for successful payments
+    if (status === 'success' && method === 'paypal') {
+      toast({
+        title: "Payment Successful!",
+        description: "Your PayPal payment has been processed successfully.",
+      });
+      // Redirect to home after 3 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    } else if (status === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your payment was cancelled. You can try again anytime.",
+        variant: "destructive",
+      });
+    } else if (status === 'error') {
+      toast({
+        title: "Payment Error",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
+    }
     
     if (id) {
       fetchOrder(id);
@@ -59,7 +84,7 @@ const OrderConfirmation = () => {
         return () => clearInterval(statusInterval);
       }
     }
-  }, [id, user, navigate, method]);
+  }, [id, user, navigate, method, status]);
 
   const fetchOrder = async (orderId: string) => {
     try {
