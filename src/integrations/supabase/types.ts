@@ -892,6 +892,7 @@ export type Database = {
       payment_transactions: {
         Row: {
           amount: number
+          callback_data: Json | null
           created_at: string | null
           currency: string
           id: string
@@ -901,7 +902,9 @@ export type Database = {
           payment_date: string | null
           payment_method_code: string
           phone_number: string | null
+          processed_at: string | null
           status: string
+          transaction_id: string | null
           transaction_reference: string | null
           updated_at: string | null
           verification_notes: string | null
@@ -911,6 +914,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          callback_data?: Json | null
           created_at?: string | null
           currency?: string
           id?: string
@@ -920,7 +924,9 @@ export type Database = {
           payment_date?: string | null
           payment_method_code: string
           phone_number?: string | null
+          processed_at?: string | null
           status?: string
+          transaction_id?: string | null
           transaction_reference?: string | null
           updated_at?: string | null
           verification_notes?: string | null
@@ -930,6 +936,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          callback_data?: Json | null
           created_at?: string | null
           currency?: string
           id?: string
@@ -939,7 +946,9 @@ export type Database = {
           payment_date?: string | null
           payment_method_code?: string
           phone_number?: string | null
+          processed_at?: string | null
           status?: string
+          transaction_id?: string | null
           transaction_reference?: string | null
           updated_at?: string | null
           verification_notes?: string | null
@@ -1756,6 +1765,15 @@ export type Database = {
       }
       is_vendor: {
         Args: { user_id: string }
+        Returns: boolean
+      }
+      record_mpesa_callback: {
+        Args: {
+          p_callback_data: Json
+          p_status?: string
+          p_transaction_id: string
+          p_verification_status?: string
+        }
         Returns: boolean
       }
     }
