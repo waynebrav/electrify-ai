@@ -8,12 +8,18 @@ import { supabase } from "@/integrations/supabase/client";
 import ARViewer from "@/components/ar/ARViewer";
 import ARProductList from "@/components/ar/ARProductList";
 import ARInfoSection from "@/components/ar/ARInfoSection";
+import ARSupermarket from "@/components/ar/ARSupermarket";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const AugmentedViewingRoom = () => {
   const [isARActive, setIsARActive] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  const [viewMode, setViewMode] = useState<'products' | 'supermarket'>('supermarket');
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const { data: arProducts, isLoading: isLoadingProducts, error } = useQuery({
     queryKey: ['ar-products'],
@@ -74,6 +80,75 @@ const AugmentedViewingRoom = () => {
   const handleLaunchAR = () => {
     setIsARActive(true);
   };
+
+  const handleAddToCart = async (productId: string, productName: string) => {
+    if (!user) {
+      toast({
+        title: "Please log in",
+        description: "You need to log in to add items to your cart",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Get or create user cart
+      let { data: cart } = await supabase
+        .from('carts')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (!cart) {
+        const { data: newCart, error } = await supabase
+          .from('carts')
+          .insert({ user_id: user.id })
+          .select('id')
+          .single();
+        
+        if (error) throw error;
+        cart = newCart;
+      }
+      
+      // Check if product already exists in cart
+      const { data: existingItem } = await supabase
+        .from('cart_items')
+        .select('id, quantity')
+        .eq('cart_id', cart.id)
+        .eq('product_id', productId)
+        .single();
+      
+      if (existingItem) {
+        // Update quantity if item exists
+        await supabase
+          .from('cart_items')
+          .update({ quantity: existingItem.quantity + 1 })
+          .eq('id', existingItem.id);
+      } else {
+        // Insert new cart item
+        await supabase
+          .from('cart_items')
+          .insert({
+            cart_id: cart.id,
+            product_id: productId,
+            quantity: 1
+          });
+      }
+      
+      toast({
+        title: "Added to cart",
+        description: `${productName} has been added to your cart`,
+      });
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast({
+        title: "Error",
+        description: "Could not add product to cart",
+        variant: "destructive",
+      });
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -89,6 +164,22 @@ const AugmentedViewingRoom = () => {
               <p className="text-lg text-gray-600 dark:text-gray-400">
                 Experience products in your space using augmented reality technology
               </p>
+              
+              {/* View Mode Toggle */}
+              <div className="flex gap-2 mt-4">
+                <Button
+                  variant={viewMode === 'supermarket' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('supermarket')}
+                >
+                  AR Supermarket
+                </Button>
+                <Button
+                  variant={viewMode === 'products' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('products')}
+                >
+                  Product Gallery
+                </Button>
+              </div>
             </div>
             <Button variant="outline" size="icon" onClick={() => setIsPanelCollapsed(!isPanelCollapsed)} className="flex-shrink-0">
               {isPanelCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelRightClose className="h-5 w-5" />}
@@ -96,24 +187,30 @@ const AugmentedViewingRoom = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className={`transition-all duration-300 ${isPanelCollapsed ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
-              <ARViewer 
-                isARActive={isARActive}
-                selectedProduct={selectedProduct}
-                onLaunchAR={handleLaunchAR}
-              />
+          {viewMode === 'supermarket' ? (
+            <div className="mb-8">
+              <ARSupermarket onAddToCart={handleAddToCart} />
             </div>
-            
-            <div className={`lg:col-span-1 ${isPanelCollapsed ? 'hidden' : 'block'}`}>
-              <ARProductList
-                arProducts={arProducts}
-                isLoading={isLoadingProducts}
-                error={error as Error | null}
-                onSelectProduct={handleSelectProduct}
-              />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className={`transition-all duration-300 ${isPanelCollapsed ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
+                <ARViewer 
+                  isARActive={isARActive}
+                  selectedProduct={selectedProduct}
+                  onLaunchAR={handleLaunchAR}
+                />
+              </div>
+              
+              <div className={`lg:col-span-1 ${isPanelCollapsed ? 'hidden' : 'block'}`}>
+                <ARProductList
+                  arProducts={arProducts}
+                  isLoading={isLoadingProducts}
+                  error={error as Error | null}
+                  onSelectProduct={handleSelectProduct}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <ARInfoSection />
         </div>

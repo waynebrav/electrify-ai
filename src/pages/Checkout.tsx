@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import PaymentMethodIcon from "@/components/PaymentMethodIcon";
+import { CurrencyDisplay } from "@/components/CurrencyDisplay";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 
@@ -129,6 +130,7 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!termsAccepted) {
       toast({
@@ -337,6 +339,8 @@ const Checkout = () => {
         description: "Failed to place your order",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -385,9 +389,9 @@ const Checkout = () => {
                           {item.product?.short_description || item.product?.description?.substring(0, 100)}
                         </p>
                       </div>
-                      <div className="font-medium">
-                        {item.product?.currency} {item.product?.price?.toLocaleString()} x {item.quantity}
-                      </div>
+                       <div className="font-medium">
+                         <CurrencyDisplay amount={item.product?.price || 0} fromCurrency={item.product?.currency} /> x {item.quantity}
+                       </div>
                     </div>
                   </div>
                 ))}
@@ -537,7 +541,7 @@ const Checkout = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                    <span>KES {totalAmount.toLocaleString()}</span>
+                    <CurrencyDisplay amount={totalAmount} />
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-400">Shipping</span>
@@ -550,7 +554,7 @@ const Checkout = () => {
                   <hr className="border-gray-200 dark:border-gray-700" />
                   <div className="flex justify-between font-medium text-lg">
                     <span>Total</span>
-                    <span>KES {totalAmount.toLocaleString()}</span>
+                    <CurrencyDisplay amount={totalAmount} />
                   </div>
                 </div>
                 
@@ -569,8 +573,16 @@ const Checkout = () => {
                   className="w-full mt-6" 
                   size="lg"
                   disabled={!termsAccepted}
+                  type="submit"
                 >
-                  Place Order
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    "Place Order"
+                  )}
                 </Button>
               </div>
             </div>

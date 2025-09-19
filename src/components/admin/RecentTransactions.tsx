@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CreditCard, Smartphone, Wallet } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2, CreditCard, Smartphone, Wallet, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CurrencyDisplay } from '@/components/CurrencyDisplay';
 
 interface Transaction {
@@ -21,6 +23,10 @@ interface Transaction {
 }
 
 export const RecentTransactions = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const ITEMS_PER_PAGE = 5;
+
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['recent-transactions'],
     queryFn: async () => {
@@ -39,8 +45,7 @@ export const RecentTransactions = () => {
             user_id
           )
         `)
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as Transaction[];
@@ -68,6 +73,16 @@ export const RecentTransactions = () => {
     }
   };
 
+  // Filter and paginate transactions
+  const filteredTransactions = transactions?.filter(transaction => 
+    transaction.payment_method_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.orders?.id?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+
   if (isLoading) {
     return (
       <Card>
@@ -87,10 +102,21 @@ export const RecentTransactions = () => {
     <Card>
       <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search transactions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {transactions?.map((transaction) => (
+          {paginatedTransactions.map((transaction) => (
             <div
               key={transaction.id}
               className="flex items-center justify-between p-4 border rounded-lg"
@@ -131,9 +157,38 @@ export const RecentTransactions = () => {
             </div>
           ))}
           
-          {!transactions?.length && (
+          {!paginatedTransactions.length && !isLoading && (
             <div className="text-center py-8 text-muted-foreground">
-              No recent transactions found
+              {searchTerm ? 'No transactions match your search' : 'No recent transactions found'}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredTransactions.length)} of {filteredTransactions.length}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                  disabled={currentPage === totalPages - 1}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
         </div>

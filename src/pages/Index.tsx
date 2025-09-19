@@ -69,9 +69,7 @@ const Index = () => {
           </Carousel>
         </section>
         
-        <LimitedOfferNotification />
-        
-        {/* User Notifications */}
+        {/* User Notifications - Admin created notifications */}
         <div className="container">
           <UserNotifications />
         </div>
