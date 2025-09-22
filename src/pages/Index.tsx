@@ -10,6 +10,8 @@ import LimitedOfferNotification from "@/components/LimitedOfferNotification";
 import ProductRecommendations from "@/components/ProductRecommendations";
 import QuickAddToCart from "@/components/QuickAddToCart";
 import UserNotifications from "@/components/UserNotifications";
+import LiveChatWidget from "@/components/LiveChatWidget";
+import PersonalizedRecommendations from "@/components/PersonalizedRecommendations";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Award, Shield } from "lucide-react";
@@ -167,9 +169,12 @@ const Index = () => {
           </div>
         </div>
         
+        <PersonalizedRecommendations />
+        
         <NewsletterSection />
       </main>
       <QuickAddToCart />
+      <LiveChatWidget />
       <Footer />
     </div>
   );

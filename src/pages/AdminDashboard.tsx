@@ -17,6 +17,7 @@ import FlashSaleManagement from "./admin/FlashSaleManagement";
 import PayPalManagement from "@/components/admin/PayPalManagement";
 import { PaymentManagement } from "@/components/admin/PaymentManagement";
 import { RecentTransactions } from "@/components/admin/RecentTransactions";
+import { EnhancedPaymentManagement } from "@/components/admin/EnhancedPaymentManagement";
 import { CurrencySettings } from "@/components/admin/CurrencySettings";
 import { useToast } from "@/components/ui/use-toast";
 import {
